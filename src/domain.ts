@@ -30,7 +30,7 @@ export const MAX_SHARE_LENGTH = 6000;
 export function defaultSession(): WatchSession {
   return {
     channels: [], globalQuality: 'auto', hideOffline: false, sidebarOpen: true,
-    chat: { open: false, channel: null, width: 340 }, layout: 'auto',
+    chat: { open: false, channel: null, width: 240 }, layout: 'auto',
   };
 }
 

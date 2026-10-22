@@ -165,7 +165,7 @@ describe('public share codes', () => {
     ]);
     expect(restored.globalQuality).toBe('480p');
     expect(restored.layout).toBe(2);
-    expect(restored.chat).toEqual({ open: false, channel: null, width: 340 });
+    expect(restored.chat).toEqual({ open: false, channel: null, width: 240 });
     expect(restored.hideOffline).toBe(false);
     expect(restored.sidebarOpen).toBe(true);
   });

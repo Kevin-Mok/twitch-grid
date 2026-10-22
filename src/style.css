@@ -43,11 +43,11 @@ small { display: block; font-size: 10px; line-height: 1.5; color: var(--muted); 
 .settings-actions button { border-color: var(--line); white-space: normal; }
 .sidebar-settings > .section-heading { margin-bottom: 10px; }
 .app-body { display: flex; flex: 1; min-height: 0; min-width: 0; position: relative; }
-.sidebar { width: 260px; flex-shrink: 0; display: flex; flex-direction: column; overflow: auto; background: var(--panel); border-right: 1px solid var(--line); padding: 20px 14px 0; scrollbar-width: thin; scrollbar-color: #46554c transparent; }
+.sidebar { width: 200px; flex-shrink: 0; display: flex; flex-direction: column; overflow: auto; background: var(--panel); border-right: 1px solid var(--line); padding: 16px 10px 0; scrollbar-width: thin; scrollbar-color: #46554c transparent; }
 .stream-controls { display: grid; gap: 8px; padding-bottom: 24px; }
 .stream-controls h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 2px; color: var(--muted); font-size: 12px; font-weight: 550; }
 .stream-controls svg { width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.stream-controls button { justify-content: flex-start; gap: 10px; min-height: 42px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 10px; background: #222726; color: #e9eeeb; font-size: 12px; font-weight: 600; }
+.stream-controls button { justify-content: flex-start; gap: 6px; min-height: 38px; padding: 8px 6px; border: 1px solid var(--line); border-radius: 10px; background: #222726; color: #e9eeeb; font-size: 11px; font-weight: 600; white-space: normal; text-align: left; }
 .stream-controls button:hover:not(:disabled) { background: #2c3230; border-color: #46554c; }
 .channel-entry { padding-bottom: 19px; }
 .channel-entry label,.eyebrow { color: #9eaaa3; font-size: 10px; letter-spacing: 1.6px; font-weight: 650; }
@@ -63,7 +63,7 @@ small { display: block; font-size: 10px; line-height: 1.5; color: var(--muted); 
 .filter-wrap input { width: 100%; border: none; background: transparent; padding-left: 0; font-size: 11px; }
 .channel-list,.profile-list { padding: 0; margin: 0; list-style: none; }
 .channel-list { display: flex; flex-direction: column; gap: 3px; }
-.channel-list li { display: flex; align-items: center; padding: 7px 2px 7px 6px; gap: 8px; min-width: 0; border-radius: 5px; }
+.channel-list li { display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: center; padding: 7px 2px 7px 6px; gap: 2px 8px; min-width: 0; border-radius: 5px; }
 .channel-list li:hover { background: #242b26; }
 .channel-avatar { flex-shrink: 0; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 7px; background: #283b31; color: #99c3ab; font-size: 9px; letter-spacing: .4px; font-weight: 700; }
 .channel-list li:nth-child(3n+2) .channel-avatar { background: #33352e; color: #bfc69c; }
@@ -71,7 +71,7 @@ small { display: block; font-size: 10px; line-height: 1.5; color: var(--muted); 
 .channel-name { display: block; min-width: 0; flex: 1; text-align: left; padding: 0; overflow: hidden; text-overflow: ellipsis; font-size: 12px; color: #e4ebe6; }
 .channel-name:hover { background: transparent; color: var(--accent); }
 .channel-name small { font-size: 9px; padding-top: 2px; }
-.channel-actions { display: flex; gap: 0; }
+.channel-actions { display: flex; gap: 0; grid-column: 2; }
 .channel-actions button { padding: 3px; min-height: 26px; width: 19px; font-size: 12px; color: #929e96; }
 .sidebar-empty { color: #8d9a91; font-size: 11px; margin: 14px 5px 22px; }
 .sidebar-settings { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: 18px 0 0; padding: 17px 0; }
@@ -132,7 +132,8 @@ small { display: block; font-size: 10px; line-height: 1.5; color: var(--muted); 
 .dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #6eb58a; flex-shrink: 0; }
 .warning-dot { background: #d9b775; }
 kbd { font-family: inherit; border: 1px solid #3e4b41; padding: 1px 4px; border-radius: 3px; color: #b6c1b8; }
-.chat-panel { position: relative; min-width: 240px; max-width: min(640px, 90vw); flex-shrink: 0; display: flex; flex-direction: column; border-left: 1px solid #344238; background: #171e19; }
+/* Reserve two 400px players, their gap, viewport padding and a thin scrollbar. */
+.chat-panel { position: relative; min-width: 240px; max-width: min(640px, max(240px, calc(100% - 832px))); flex-shrink: 0; display: flex; flex-direction: column; border-left: 1px solid #344238; background: #171e19; }
 .chat-header { display: flex; gap: 4px; align-items: center; padding: 4px 8px; border-bottom: 1px solid var(--line); min-height: 38px; }
 .chat-header button { min-width: 30px; padding: 3px; }
 .chat-channel-select { display: flex; align-items: center; flex: 1; min-width: 0; gap: 4px; }
@@ -178,8 +179,7 @@ kbd { font-family: inherit; border: 1px solid #3e4b41; padding: 1px 4px; border-
 .shared-banner strong { font-size: 13px; }
 .shared-banner p { font-size: 11px; color: #adcab4; margin: 5px 0 0; overflow-wrap: anywhere; }
 @media (max-width: 900px) {
-  .sidebar { width: 240px; }
-  .chat-panel { position: absolute; right: 0; top: 0; bottom: 0; z-index: 6; box-shadow: -15px 0 35px #0007; }
+  .chat-panel { position: absolute; right: 0; top: 0; bottom: 0; max-width: min(640px, 90vw); z-index: 6; box-shadow: -15px 0 35px #0007; }
 }
 @media (max-width: 650px) {
   .sidebar { position: absolute; left: 0; top: 0; bottom: 0; z-index: 7; width: min(280px, 85vw); box-shadow: 15px 0 35px #0007; }

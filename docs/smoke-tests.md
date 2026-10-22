@@ -17,6 +17,8 @@ Use these checks against a static production build to verify actual viewing beha
 
 ## Layout, keyboard and chat
 
+- Action: Add four streams, use Auto grid and open chat with the sidebar visible at widths 1280, 1366, 1440 and 1920 (normal browser zoom). Resize chat wider, narrow the window, then widen it again. Check sidebar controls and channel actions at 390px too.
+  Expected: Desktop sidebar uses 200px and new chat starts at 240px; two videos fit across without horizontal canvas scrolling. Wider chat is automatically capped when needed, retaining its preferred saved width for a wider window. Channel actions sit below names; playback buttons remain readable. Mobile keeps overlay panels. Video/chat frames remain mounted throughout resizing.
 - Action: Open the app in a fresh browser tab, then open `/favicon.svg` on the same origin.
   Expected: The tab icon and SVG retain a purple-and-white 2×2 logo. Normal viewing has no app header logo or title row.
 - Action: Check 1, 2, 3, 5 and 8 players at 1440×900 and 1280×800. Also inspect controls at widths 390 and 768. Try 1–4 columns and focus one stream.
