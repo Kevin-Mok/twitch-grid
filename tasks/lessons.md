@@ -14,3 +14,5 @@ Use these local lessons when changing this app. Reproduce a boundary failure fir
 - ONLINE, available qualities and a live thumbnail do not prove playback. Record advancing video separately from human audibility, and keep third-party visibility warnings unresolved until a discriminating check passes.
 
 - Removing a visible status label can break readiness checks in unrelated browser scenarios. Search all tests for the old text and use the retained accessible status indicator without weakening playback/quality assertions.
+
+- Twitch playback stats are cached and start at zero. Label the provider explicitly: an averaged decoded/total-frame rate can conceal uneven frame delivery. Treat reported FPS as a diagnostic with unsupported/stale states; do not infer displayed smoothness, source FPS or a GPU/network bottleneck. Public freshness/ad-state gaps must be resolved before an app quality policy uses the metric.

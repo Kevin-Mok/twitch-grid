@@ -54,6 +54,9 @@ export const createTwitchPlayer: PlayerFactory = async (host, channel, emit) => 
   });
   let ready = false;
   let disposed = false;
+  let previousStats: unknown;
+  let previousRate: unknown;
+  let statsChangedAt = 0;
   let previousFps: unknown;
   let previousFpsStats: unknown;
   let fpsChangedAt = 0;
@@ -67,6 +70,7 @@ export const createTwitchPlayer: PlayerFactory = async (host, channel, emit) => 
   const sample = () => {
     if (!ready || disposed) return;
     try {
+      let bitrateKbps: number | null = null;
       let fps: number | null = null;
       const quality = player.getQuality();
       const paused = player.isPaused();
@@ -86,10 +90,16 @@ export const createTwitchPlayer: PlayerFactory = async (host, channel, emit) => 
           }
           fps = fpsSamples.reduce((sum, sample) => sum + sample.value, 0) / fpsSamples.length;
         }
+        const reportedRate = stats && typeof stats === 'object' && 'playbackRate' in stats ? stats.playbackRate : undefined;
+        // The SDK caches stats; object replacement or a bitrate change refreshes this conservative guard.
+        if (stats !== previousStats || reportedRate !== previousRate) {
+          previousStats = stats; previousRate = reportedRate; statsChangedAt = Date.now();
+        }
+        if (document.visibilityState === 'visible' && Date.now() - statsChangedAt < 6000 && typeof reportedRate === 'number' && Number.isFinite(reportedRate) && reportedRate > 0) bitrateKbps = reportedRate;
       } catch { /* Unsupported playback stats must not hide otherwise usable player status. */ }
       if (fps === null) fpsSamples.length = 0;
       const qualities = player.getQualities().map(quality => typeof quality === 'string' ? quality : quality.group).filter(Boolean);
-      emit({ type: 'sample', quality, qualities, muted: player.getMuted(), volume: player.getVolume(), paused, fps });
+      emit({ type: 'sample', quality, qualities, muted: player.getMuted(), volume: player.getVolume(), paused, bitrateKbps, fps });
     } catch { fpsSamples.length = 0; emit({ type: 'error', message: 'Player status is unavailable. Refresh status or reload this stream.' }); }
   };
   for (const [name, type] of eventMap) {

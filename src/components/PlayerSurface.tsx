@@ -12,8 +12,9 @@ interface Props {
   patchChannel(login: string, patch: Partial<Channel>): void;
   openChat(login: string): void; remove(login: string): void;
   focus: string | null; setFocus(login: string | null): void;
+  onBitrates(bitrates: Record<string, number | null>): void;
 }
-export function PlayerSurface({ session, managerRef, patchChannel, openChat, remove, focus, setFocus }: Props) {
+export function PlayerSurface({ session, managerRef, patchChannel, openChat, remove, focus, setFocus, onBitrates }: Props) {
   const surface = useRef<HTMLDivElement>(null);
   const viewport = useRef<HTMLDivElement>(null);
   const [slots, setSlots] = useState<PlayerSlot[]>([]);
@@ -31,6 +32,9 @@ export function PlayerSurface({ session, managerRef, patchChannel, openChat, rem
     manager.sync(session.channels, session.globalQuality);
     setSlots(manager.slots());
   }, [session.channels, session.globalQuality, managerRef, revision]);
+  useEffect(() => {
+    onBitrates(Object.fromEntries(slots.map(slot => [slot.channel.login, slot.snapshot.bitrateKbps])));
+  }, [slots, revision, onBitrates]);
   useEffect(() => {
     const element = viewport.current!;
     const observer = new ResizeObserver(entries => {
@@ -71,7 +75,7 @@ export function PlayerSurface({ session, managerRef, patchChannel, openChat, rem
       const label = statusLabel(state);
       const name = channel.displayName ?? channel.login;
       return [
-        createPortal(<><span className={`live-indicator ${state.live}`} role="img" aria-label={label} /><strong>{name}</strong>{state.live !== 'online' && <span className={`status-label ${state.live}`}>{label}</span>}<span className="fps-indicator" role="note" aria-label={`${channel.login}: Twitch estimated playback FPS ${state.fps === null ? 'unavailable' : state.fps.toFixed(0)}`} title="Estimated Twitch playback FPS: first valid reading within two seconds, then averaged over up to ten seconds. This does not measure displayed smoothness.">{state.fps === null ? 'FPS —' : `${state.fps.toFixed(0)} FPS`}</span><div className="tile-heading-actions"><button aria-label={`Open chat for ${channel.login}`} title="Open chat" onClick={() => openChat(channel.login)}>▤</button><button aria-label={focus === channel.login ? `Unfocus ${channel.login}` : `Focus ${channel.login}`} title="Enlarge stream" onClick={() => setFocus(focus === channel.login ? null : channel.login)}>⤢</button><button aria-label={`Fullscreen ${channel.login}`} title="Fullscreen player" onClick={() => { void slot.element.requestFullscreen().catch(() => {}); }}>⛶</button><button aria-label={`Remove player ${channel.login}`} title="Remove stream" onClick={() => remove(channel.login)}>×</button></div></>, slot.header, `${channel.login}-header`),
+        createPortal(<><span className={`live-indicator ${state.live}`} role="img" aria-label={label} /><strong>{name}</strong>{state.live !== 'online' && <span className={`status-label ${state.live}`}>{label}</span>}<span className="fps-indicator" role="note" aria-label={`${channel.login}: Twitch estimated playback FPS ${state.fps === null ? 'unavailable' : state.fps.toFixed(0)}`} title="Estimated Twitch playback FPS: first valid reading within two seconds, then averaged over up to ten seconds. This does not measure displayed smoothness.">{state.fps === null ? 'FPS —' : `${state.fps.toFixed(0)} FPS`}</span><span className="bitrate-indicator" role="note" aria-label={`${channel.login}: playback bitrate ${state.bitrateKbps === null ? 'unavailable' : `${(state.bitrateKbps / 8000).toFixed(2)} megabytes per second`}`} title="Twitch-reported playback bitrate, not actual network download speed.">{state.bitrateKbps === null ? 'Bitrate —' : `↓ ${(state.bitrateKbps / 8000).toFixed(2)} MB/s`}</span><div className="tile-heading-actions"><button aria-label={`Open chat for ${channel.login}`} title="Open chat" onClick={() => openChat(channel.login)}>▤</button><button aria-label={focus === channel.login ? `Unfocus ${channel.login}` : `Focus ${channel.login}`} title="Enlarge stream" onClick={() => setFocus(focus === channel.login ? null : channel.login)}>⤢</button><button aria-label={`Fullscreen ${channel.login}`} title="Fullscreen player" onClick={() => { void slot.element.requestFullscreen().catch(() => {}); }}>⛶</button><button aria-label={`Remove player ${channel.login}`} title="Remove stream" onClick={() => remove(channel.login)}>×</button></div></>, slot.header, `${channel.login}-header`),
         createPortal(<>{state.error ? <span className="tile-message" role="alert">{state.error}</span> : (stale || state.audioPending) && <span className="tile-message">{state.audioPending ? 'Audio preference pending. Use Twitch’s audio controls to retry if it stays pending.' : 'Status is stale. Reload this channel to check again.'}</span>}
         </>, slot.element, `${channel.login}-message`),
       ];

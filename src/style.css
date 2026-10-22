@@ -99,6 +99,7 @@ small { display: block; font-size: 10px; line-height: 1.5; color: var(--muted); 
 .watch-workspace { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
 .is-active { color: var(--accent); background: #24382b; }
 .watch-content { flex: 1; min-height: 0; min-width: 0; display: flex; position: relative; }
+.video-region { flex: 1; min-width: 0; min-height: 0; display: flex; position: relative; }
 .player-viewport { flex: 1; min-width: 0; min-height: 0; overflow: auto; position: relative; padding: 8px; scrollbar-width: thin; scrollbar-color: #34443a #111512; }
 .player-surface { position: relative; overflow: clip; }
 .player-tile { position: absolute; left: 0; top: 0; transform-origin: top left; display: flex; flex-direction: column; border: 0; border-radius: 6px; background: #1d2320; overflow: hidden; outline: 1px solid #2d3931; }
@@ -189,3 +190,11 @@ kbd { font-family: inherit; border: 1px solid #3e4b41; padding: 1px 4px; border-
   .dialog-content { padding: 18px; }
 }
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior: auto !important; } }
+
+.fps-indicator, .bitrate-indicator { flex-shrink: 0; color: var(--muted); font-size: 10px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.bitrate-summary { margin-bottom: 8px; font-size: 10px; color: var(--muted); }
+.bitrate-summary > span { display: flex; justify-content: space-between; gap: 6px; }
+.bitrate-summary strong { color: #e9eeeb; font-variant-numeric: tabular-nums; }
+
+.bandwidth-total { position: absolute; right: 12px; bottom: 8px; z-index: 5; padding: 2px 4px; border-radius: 3px; background: #191c1dcc; color: var(--muted); font-size: 10px; line-height: 1.2; font-variant-numeric: tabular-nums; white-space: nowrap; pointer-events: none; }

@@ -21,6 +21,19 @@ Use these checks against a static production build to verify actual viewing beha
 - Action: Switch to another browser tab for at least a minute, then return. Repeat with a background window if useful.
   Expected: The app performs no visibility-triggered reload or force-play. Record any browser/Twitch suspension; actual audio continuity needs human observation.
 
+## Playback diagnostics and stream bitrate
+
+- Action: In a visible desktop browser add two currently live channels and start playback. Open the sidebar; inspect each tile and the Stream bitrate total. Repeat at widths 390, 768, 1280 and 1440.
+  Expected: Each supported active stream shows estimated Twitch playback bandwidth in MB/s (megabytes per second). The total sums reporting channels and shows `2/2 streams reporting` when both are available. In the controlled fixture, 3000 and 5000 Kbps produce `↓ 0.38 MB/s` and `↓ 0.63 MB/s` per stream and an unrounded sum of 1.00 MB/s. Labels distinguish playback bitrate from actual network download speed.
+- Action: With two reporting streams, close the sidebar and inspect the small bottom-right rate in the video area, immediately left of chat at 390/768/1280/1440 widths. Open chat or maximize video; click any native controls beneath the badge area.
+  Expected: On desktop the rate stays beside chat without adding a bar or changing player geometry; on mobile it remains anchored to the video pane and may be covered by the chat overlay. It remains contained and compact, uses MB/s, and lets clicks pass through. The compact readout uses a download arrow, for example `↓ 0.63 MB/s`; no valid readings shows `↓ — MB/s`. Partial coverage is described accessibly. Reporting counts remain available in the sidebar and accessible description. The reading remains estimated playback bandwidth, not measured network download traffic.
+- Action: Pause one stream, remove it, then block/omit stats for the remaining stream in the fixture. Try zero/nonfinite/throwing stats, hidden-tab samples and an unchanged cached sample for eight seconds; return to active valid playback.
+  Expected: Unavailable bitrate readings show `Bitrate —`. A total covering only some channels is marked partial with its reporting count; no reporting streams means Unavailable, not zero download traffic. Removed streams stop contributing/sampling; retained iframes stay connected. Valid samples restore readings. Hidden tabs clear on the next sample; browser throttling can delay sampling. The cache guard is conservative.
+- Action: Keep Auto or a manual quality preference, watch the bitrate change, filter the channel list, and change layout/chat or reload the page.
+  Expected: Total includes all current reporting streams regardless of the filter. Diagnostics do not change quality/audio, remount frames, or persist measurements. The user’s preferences remain intact; a page reload starts fresh observations.
+- Action: If four streams stutter, pause three and compare the remaining one; the user reports one stream is smooth. Use Twitch’s native quality menu to try an available lower resolution on the full lineup if useful, then restore choices.
+  Expected: A smoother single-stream/lower-resolution result supports investigating combined workload but does not prove CPU/GPU/network cause. Bitrate is not a speed test and does not guarantee screen smoothness. Record moving video and audio separately.
+
 ## Layout, keyboard and chat
 
 - Action: Add four streams, use Auto grid and open chat with the sidebar visible at widths 1280, 1366, 1440, 1920 and 2048 (normal browser zoom). Widen chat to its maximum, then check 1280×900, 1440×730 and 2048×973 before widening the window again. Check sidebar controls and channel actions at 390px too.

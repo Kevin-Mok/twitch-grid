@@ -22,10 +22,13 @@ export function App() {
   const [error, setError] = useState<string | null>(null);
   const [transfer, setTransfer] = useState<'share' | 'backup' | null>(null);
   const [focus, setFocus] = useState<string | null>(null);
+  const [bitrates, setBitrates] = useState<Record<string, number | null>>({});
   const [videoMaximized, setVideoMaximized] = useState(false);
   const [undo, setUndo] = useState<WatchSession | null>(null);
   const manager = useRef<PlayerManager | null>(null);
   const session = data.session;
+  const reportingRates = session.channels.map(channel => bitrates[channel.login]).filter((rate): rate is number => typeof rate === 'number' && Number.isFinite(rate) && rate > 0);
+  const totalMBps = reportingRates.reduce((sum, rate) => sum + rate, 0) / 8000;
   const current = useRef(data); current.current = data;
   const updateSession = useCallback((update: (session: WatchSession) => WatchSession) => {
     setData(previous => ({ ...previous, session: update(previous.session) }));
@@ -105,14 +108,19 @@ export function App() {
     {!session.sidebarOpen && !videoMaximized && <button className="reopen-sidebar sidebar-toggle" aria-label="Toggle sidebar (Ctrl+B)" title="Open sidebar · Ctrl+B" onClick={() => run('toggle-sidebar')}>☰</button>}
     {storageWarning && <div className="storage-warning" role="alert"><span>{storageWarning}</span><button onClick={() => setTransfer('backup')}>Back up data</button><button onClick={retryStorage}>Enable saving</button></div>}
     <div className="app-body">
-      {session.sidebarOpen && <Sidebar data={data} setData={setData} add={add} remove={remove} clear={clear} refresh={login => manager.current?.reload(login)}
+      {session.sidebarOpen && <Sidebar bitrates={bitrates} data={data} setData={setData} add={add} remove={remove} clear={clear} refresh={login => manager.current?.reload(login)}
         reorder={(login, direction) => updateSession(s => moveChannel(s, login, direction))}
         openChat={openChat} onStreamCommand={run} onWorkspaceCommand={run} onMaximize={() => setVideoMaximized(true)} onTransfer={setTransfer} onError={setError} onNotice={setNotice} />}
       <main className="watch-workspace">
         {error && <div className="message error" role="alert"><span>{error}</span><button aria-label="Dismiss error" onClick={() => setError(null)}>×</button></div>}
         {notice && <div className="message notice" role="status"><span>{notice}</span>{undo && <button onClick={() => { updateSession(() => undo); setUndo(null); setNotice('Previous stream list restored.'); }}>Undo</button>}<button aria-label="Dismiss notice" onClick={() => { setNotice(null); setUndo(null); }}>×</button></div>}
         <div className="watch-content">
-          <PlayerSurface session={session} managerRef={manager} patchChannel={patchChannel} remove={remove} openChat={openChat} focus={focus} setFocus={setFocus} />
+          <div className="video-region">
+            <PlayerSurface onBitrates={setBitrates} session={session} managerRef={manager} patchChannel={patchChannel} remove={remove} openChat={openChat} focus={focus} setFocus={setFocus} />
+            {!!session.channels.length && <div className="bandwidth-total" role="note" aria-label="Total stream bandwidth in megabytes per second" aria-description={`${reportingRates.length}/${session.channels.length} streams reporting.${reportingRates.length > 0 && reportingRates.length < session.channels.length ? ' Partial total.' : ''} Estimated Twitch playback bandwidth, not actual network download speed.`}>
+              ↓ {reportingRates.length ? `${totalMBps.toFixed(2)} MB/s` : '— MB/s'}
+            </div>}
+          </div>
           <ChatPanel settings={session.chat} channels={session.channels} update={chat => updateSession(s => ({ ...s, chat }))} />
         </div>
       </main>

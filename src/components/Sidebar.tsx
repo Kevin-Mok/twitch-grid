@@ -2,6 +2,7 @@ import { useState, type Dispatch, type SetStateAction } from 'react';
 import type { AppData, LayoutMode } from '../domain';
 
 interface Props {
+  bitrates: Record<string, number | null>;
   data: AppData; setData: Dispatch<SetStateAction<AppData>>;
   add(input: string): boolean; remove(login: string): void; clear(): void; refresh(login: string): void;
   reorder(login: string, direction: -1 | 1): void; openChat(login: string): void;
@@ -10,11 +11,13 @@ interface Props {
   onMaximize(): void; onTransfer(mode: 'share' | 'backup'): void;
   onError(error: string | null): void; onNotice(message: string): void;
 }
-export function Sidebar({ data, setData, add, remove, clear, refresh, reorder, openChat, onStreamCommand, onWorkspaceCommand, onMaximize, onTransfer, onError, onNotice }: Props) {
+export function Sidebar({ bitrates, data, setData, add, remove, clear, refresh, reorder, openChat, onStreamCommand, onWorkspaceCommand, onMaximize, onTransfer, onError, onNotice }: Props) {
   const [input, setInput] = useState('');
   const [filter, setFilter] = useState('');
   const [name, setName] = useState('');
   const session = data.session;
+  const rates = session.channels.map(channel => bitrates[channel.login]).filter((rate): rate is number => typeof rate === 'number' && Number.isFinite(rate) && rate > 0);
+  const totalMBps = rates.reduce((sum, rate) => sum + rate, 0) / 8000;
   const save = () => {
     if (!name.trim() || name.trim().length > 80) { onError('Use a profile name between 1 and 80 characters.'); return; }
     if (data.profiles.length >= 50) { onError('You can keep up to 50 profiles. Export a backup before removing older profiles.'); return; }
@@ -37,6 +40,10 @@ export function Sidebar({ data, setData, add, remove, clear, refresh, reorder, o
       <p>Paste names or links, separated by commas.</p>
     </form>
     <div className="section-heading"><h2>Streams <span>{session.channels.length.toString().padStart(2, '0')}</span></h2><button className="text-button" onClick={clear} disabled={!session.channels.length}>Clear all</button></div>
+    <div className="bitrate-summary" role="note" aria-label="Combined stream playback bitrate" title="Sum of available Twitch playback bitrates, not actual network download speed. Paused or unavailable streams are excluded.">
+      <span>Stream bitrate <strong>{rates.length ? `${totalMBps.toFixed(2)} MB/s` : 'Unavailable'}</strong></span>
+      <small>{rates.length}/{session.channels.length} streams reporting{rates.length > 0 && rates.length < session.channels.length ? ' · partial' : ''}</small>
+    </div>
     <div className="filter-wrap"><span aria-hidden="true">⌕</span><input aria-label="Filter streams" value={filter} onChange={e => setFilter(e.target.value)} placeholder="Filter your streams" /></div>
     <ol className="channel-list">
       {session.channels.filter(c => c.login.includes(filter.toLowerCase())).map(channel => {

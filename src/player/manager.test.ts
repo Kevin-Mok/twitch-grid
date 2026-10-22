@@ -31,6 +31,33 @@ function fixture() {
 }
 
 describe('persistent player manager', () => {
+  it('shows reported bitrate only during active playback and never changes Auto or manual quality for low bitrate', async () => {
+    const f = fixture(); f.manager.sync([channel('alpha')], 'auto'); await tick();
+    const emit = f.emitters.get('alpha')!;
+    const sample = (bitrateKbps: number | null, quality = 'auto') => emit({ type: 'sample', bitrateKbps, muted: true, volume: 0.5, paused: false, quality, qualities: ['auto', '720p60', '480p30'] } as PlayerEvent);
+    emit({ type: 'ready' }); sample(60);
+    expect(f.manager.slots()[0].snapshot).toMatchObject({ bitrateKbps: null });
+    emit({ type: 'online' }); emit({ type: 'playing' }); sample(3100);
+    expect(f.manager.slots()[0].snapshot).toMatchObject({ bitrateKbps: 3100 });
+    const before = f.calls.length;
+    for (let i = 0; i < 10; i++) sample(15);
+    expect(f.calls.slice(before)).toEqual([]);
+    for (const type of ['pause', 'offline', 'play', 'blocked', 'error'] as const) {
+      emit({ type: 'online' }); emit({ type: 'playing' }); sample(60);
+      emit(type === 'error' ? { type, message: 'test' } : { type });
+      expect(f.manager.slots()[0].snapshot).toMatchObject({ bitrateKbps: null });
+    }
+    emit({ type: 'online' }); emit({ type: 'playing' }); sample(null);
+    expect(f.manager.slots()[0].snapshot).toMatchObject({ bitrateKbps: null });
+    f.manager.sync([{ ...channel('alpha'), quality: '720p60' }], 'auto');
+    sample(3100, '720p60');
+    const manualBefore = f.calls.length;
+    sample(10, '720p60');
+    expect(f.calls.slice(manualBefore)).toEqual([]);
+    expect(f.manager.slots()[0].channel.quality).toBe('720p60');
+    f.manager.destroy();
+  });
+
   it('exposes FPS only for confirmed active playback and clears lifecycle transitions', async () => {
     const f = fixture(); f.manager.sync([channel('alpha')], 'auto'); await tick();
     const emit = f.emitters.get('alpha')!;

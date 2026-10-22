@@ -5,6 +5,53 @@ import type { PlayerEvent, PlayerHandle } from './types';
 let handle: PlayerHandle | undefined;
 afterEach(() => { handle?.destroy(); handle = undefined; vi.useRealTimers(); delete window.Twitch; document.body.replaceChildren(); vi.restoreAllMocks(); });
 
+it('samples only valid Twitch playback bitrate and expires cached snapshots without affecting status', async () => {
+  vi.useFakeTimers();
+  const listeners = new Map<string, () => void>();
+  let stats: unknown = { playbackRate: 3100 };
+  let failStats = false;
+  class Player {
+    static READY = 'ready'; static ONLINE = 'online'; static OFFLINE = 'offline'; static PLAY = 'play';
+    static PLAYING = 'playing'; static PAUSE = 'pause'; static PLAYBACK_BLOCKED = 'blocked';
+    addEventListener(event: string, listener: () => void) { listeners.set(event, listener); }
+    removeEventListener(event: string) { listeners.delete(event); }
+    play() {} pause() {} setMuted() {} setVolume() {} setQuality() {}
+    getMuted() { return true; } getVolume() { return 0.5; }
+    getQuality() { return 'auto'; } getQualities() { return [{ group: 'auto' }, { group: '720p60' }]; }
+    isPaused() { return false; }
+    getPlaybackStats() { if (failStats) throw new Error('unsupported'); return stats; }
+  }
+  window.Twitch = { Player };
+  const host = document.createElement('div'); document.body.append(host);
+  const events: PlayerEvent[] = [];
+  handle = await createTwitchPlayer(host, 'alpha', event => events.push(event));
+  listeners.get('ready')!();
+  handle.sample();
+  expect(events.at(-1)).toMatchObject({ type: 'sample', bitrateKbps: 3100, quality: 'auto' });
+  await vi.advanceTimersByTimeAsync(8000);
+  expect(events.at(-1)).toMatchObject({ type: 'sample', bitrateKbps: null });
+  (stats as { playbackRate: number }).playbackRate = 2800;
+  handle.sample();
+  expect(events.at(-1)).toMatchObject({ type: 'sample', bitrateKbps: 2800 });
+  for (const playbackRate of [6000, 0, -1, NaN, Infinity, '3000', undefined]) {
+    stats = { playbackRate }; handle.sample();
+    expect(events.at(-1)).toMatchObject({ type: 'sample', bitrateKbps: playbackRate === 6000 ? 6000 : null });
+  }
+  stats = null; handle.sample();
+  expect(events.at(-1)).toMatchObject({ type: 'sample', bitrateKbps: null });
+  failStats = true; handle.sample();
+  expect(events.at(-1)).toMatchObject({ type: 'sample', bitrateKbps: null, quality: 'auto' });
+  failStats = false;
+  vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('hidden');
+  stats = { playbackRate: 6000 }; handle.sample();
+  expect(events.at(-1)).toMatchObject({ type: 'sample', bitrateKbps: null });
+  const before = events.length;
+  handle.destroy(); handle = undefined;
+  await vi.advanceTimersByTimeAsync(10000);
+  expect(events).toHaveLength(before);
+  expect(listeners.size).toBe(0);
+});
+
 it('estimates FPS within five seconds, refines recent samples and resets unusable windows', async () => {
   vi.useFakeTimers();
   const listeners = new Map<string, () => void>();
