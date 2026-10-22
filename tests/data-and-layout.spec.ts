@@ -86,13 +86,13 @@ test('blocked SDK loading surfaces an actionable per-player error', async ({ pag
 });
 
 for (const count of [1, 2, 3, 5, 8]) {
-  test(`layout with ${count} players respects minimum embeds at practical desktop sizes`, async ({ page }) => {
+  test(`layout with ${count} players preserves internal minimum embeds at practical desktop sizes`, async ({ page }) => {
     await page.goto('/');
     await add(page, ['alpha', 'bravo', 'charlie', 'delta', 'echo', 'foxtrot', 'golf', 'hotel'].slice(0, count).join(' '));
     await expect(page.locator('.video-host iframe')).toHaveCount(count);
     for (const width of [1440, 1280]) {
       await page.setViewportSize({ width, height: 900 });
-      await expect.poll(async () => page.locator('.video-host iframe').evaluateAll(frames => frames.every(frame => { const r = frame.getBoundingClientRect(); return r.width >= 399.9 && r.height >= 299.9; }))).toBe(true);
+      await expect.poll(async () => page.locator('.video-host iframe').evaluateAll(frames => frames.every(frame => (frame as HTMLElement).offsetWidth >= 400 && (frame as HTMLElement).offsetHeight >= 300))).toBe(true);
       const rects = await page.locator('.player-tile').evaluateAll(tiles => tiles.map(tile => { const r = tile.getBoundingClientRect(); return { x: r.x, y: r.y, right: r.right, bottom: r.bottom }; }));
       for (let a = 0; a < rects.length; a++) for (let b = a + 1; b < rects.length; b++) {
         expect(rects[a].right <= rects[b].x || rects[b].right <= rects[a].x || rects[a].bottom <= rects[b].y || rects[b].bottom <= rects[a].y).toBe(true);

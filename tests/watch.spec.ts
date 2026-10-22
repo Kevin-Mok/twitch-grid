@@ -14,10 +14,11 @@ test('player videos fill header-only tiles without duplicate controls', async ({
     await page.setViewportSize({ width, height: 900 });
     await expect(page.locator('.tile-footer, .volume-slider')).toHaveCount(0);
     await expect.poll(() => page.locator('.player-tile').evaluateAll(tiles => tiles.every(tile => {
-      const video = tile.querySelector('.video-host')!.getBoundingClientRect();
+      const host = tile.querySelector<HTMLElement>('.video-host')!;
+      const video = host.getBoundingClientRect();
       const header = tile.querySelector('.tile-header')!.getBoundingClientRect();
       const bounds = tile.getBoundingClientRect();
-      return video.height >= 300 && Math.abs(video.top - header.bottom) < 1 && Math.abs(video.bottom - bounds.bottom) <= 1;
+      return host.offsetHeight >= 300 && Math.abs(video.top - header.bottom) < 1 && Math.abs(video.bottom - bounds.bottom) <= 1;
     }))).toBe(true);
     await page.screenshot({ path: `/tmp/player-no-footer-${width}.png` });
   }

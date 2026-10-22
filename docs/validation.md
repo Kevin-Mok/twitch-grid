@@ -38,7 +38,7 @@ Twitch does not document its complete visibility algorithm. Minimum size and uno
 
 [Research](research.md), the [feature matrix](feature-parity.md), [sanitized REA evidence index](evidence/rea-evidence-index.json) and [Viewington profile fixtures](evidence/viewington-profile-fixtures.json) contain exact versions, evidence IDs, hashes and reproduction limits. REA 6.7.0 inspected the live web application and selected Electron resources from the official Windows 0.6.8 installer. The installer was not executed on Linux. Temporary installers and third-party bundles are outside the delivered app.
 
-Original and rebuild screenshots use a 1440×913 viewport. The comparison concerns compact controls, channel/profile workflow and video geometry; different live video frames are not visual failures. The rebuild uses a docked sidebar, 8px gaps, minimum-size scrolling and one right chat panel. It preserves overlapping profiles' player instances, where the inspected reference web app recreated them. Reference overlay-sidebar behavior, customizable settings and Electron integrations are explicit parity gaps rather than implied matches.
+Original and rebuild screenshots use a 1440×913 viewport. The comparison concerns compact controls, channel/profile workflow and video geometry; different live video frames are not visual failures. The rebuild uses a docked sidebar, logical 8px gaps, a grid scaled to fit the viewport and one right chat panel. It preserves overlapping profiles' player instances, where the inspected reference web app recreated them. Reference overlay-sidebar behavior, customizable settings and Electron integrations are explicit parity gaps rather than implied matches.
 
 ## Remaining checks and useful next work
 

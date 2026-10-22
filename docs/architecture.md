@@ -47,7 +47,7 @@ Shares use a separate version-1 public payload (ordered login list, default qual
 
 ## Layout rules
 
-The inspected reference tests column counts and maximizes a centered 16:9 tile size, with a centered incomplete last row. This implementation uses an 8px gap and 36px header chrome. It honors Twitch’s minimum 400×300 video viewport; at narrow widths the native player may letterbox video. Auto layout chooses the largest fit, or the smallest vertical scroll canvas when none fits. Manual columns may require horizontal scrolling. Focus enlarges one tile and leaves other instances alive below it.
+The inspected reference tests column counts and maximizes a centered 16:9 tile size, with a centered incomplete last row. This implementation uses a logical 8px gap and 36px header chrome. `calculateLayout` preserves Twitch’s internal 400×300 video viewport minimum; the native player may letterbox video. Auto layout chooses the largest fit, or the shortest logical canvas when minimums cannot fit. PlayerSurface uniformly scales the logical tile transforms to the measured viewport, including manual columns and focus mode, so all rows fit without scrolling. Headers scale with the video, so dense lineups have smaller controls. Permanent hosts remain mounted; clipping the fixed-size surface prevents unscaled boxes or parked hosts from creating scrollbars. Focus enlarges one tile relative to the remaining tiles.
 
 ## Adding a control, panel or provider
 

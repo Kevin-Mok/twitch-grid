@@ -4,6 +4,7 @@ Use these local lessons when changing this app. Reproduce a boundary failure fir
 
 - Reordering keyed React elements can still move iframe browsing contexts. Keep permanent video hosts under one parent and change geometry only; verify DOM identity and navigation counts.
 - ResizeObserver contentRect already excludes padding. Use its dimensions directly; regression checks for reserved grid space must assert row/column geometry, since a one-column stack can also have no horizontal overflow.
+- When fitting a scaled video grid, verify visible bounds with getBoundingClientRect and Twitch's internal embed minimums with offsetWidth/offsetHeight. A displayed 300px minimum contradicts fitting multiple rows into short viewports.
 - SDK setter calls cross an asynchronous frame boundary. Do not overwrite saved audio targets with pre-acknowledgment samples, or mark a quality applied before its handle exists.
 - Unknown player state is not offline. A valid sample after an observation failure clears the error without inventing ONLINE evidence.
 - Importing validated data does not grant permission to overwrite unreadable stored data. Keep the storage write gate until the explicit recovery action.

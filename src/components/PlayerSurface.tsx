@@ -43,23 +43,26 @@ export function PlayerSurface({ session, managerRef, patchChannel, openChat, rem
   const visible = session.channels.filter(channel => !session.hideOffline || slots.find(slot => slot.channel.login === channel.login)?.snapshot.live !== 'offline');
   const focusIndex = focus ? visible.findIndex(c => c.login === focus) : -1;
   const layout = calculateLayout(visible.length, size.width, size.height, session.layout, focusIndex >= 0 ? focusIndex : null);
+  const scale = Math.min(1, size.width / layout.width, size.height / layout.height);
   useLayoutEffect(() => {
     for (const slot of slots) {
       const index = visible.findIndex(channel => channel.login === slot.channel.login);
       const tile = index >= 0 ? layout.tiles[index] : { x: 0, y: -10000, width: 400, height: 336 };
-      Object.assign(slot.element.style, { width: `${tile.width}px`, height: `${tile.height}px`, transform: `translate(${tile.x}px, ${tile.y}px)` });
+      const x = (size.width - layout.width * scale) / 2 + tile.x * scale;
+      const y = (size.height - layout.height * scale) / 2 + tile.y * scale;
+      Object.assign(slot.element.style, { width: `${tile.width}px`, height: `${tile.height}px`, transform: `translate(${x}px, ${y}px) scale(${scale})` });
       slot.element.classList.toggle('parked', index < 0);
       slot.element.classList.toggle('focused', slot.channel.login === focus);
       slot.element.inert = index < 0;
       slot.element.setAttribute('aria-hidden', String(index < 0));
     }
-  }, [slots, layout, visible, focus]);
+  }, [slots, layout, visible, focus, scale, size]);
 
   return <div className="player-viewport" ref={viewport}>
     {focus && <button aria-label="Show all streams" className="focus-exit" onClick={() => setFocus(null)}>↙ Show all streams</button>}
     {!session.channels.length && <div className="empty-workspace"><div className="empty-grid" aria-hidden="true"><span /><span /><span /><span /></div><p className="eyebrow">ONE WORKSPACE. EVERY STREAM.</p><h1>Make room for your favorites.</h1><p>Add Twitch channels from the sidebar.<br />Arrange your view, pick your sound, and settle in.</p><span className="empty-note">Your profiles stay in this browser.</span></div>}
     {!!session.channels.length && !visible.length && <div className="all-offline"><h2>Your streams are offline</h2><p>Their players remain loaded to watch for live events.<br />If status becomes stale, show offline streams and reload a channel.</p></div>}
-    <div className="player-surface" ref={surface} style={{ width: layout.width, height: layout.height }} />
+    <div className="player-surface" ref={surface} style={{ width: size.width, height: size.height }} />
     {slots.map(slot => {
       const channel = session.channels.find(c => c.login === slot.channel.login);
       if (!channel) return null;
