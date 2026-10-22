@@ -106,7 +106,7 @@ The user explicitly requested `commit-session`. Scope helper could not detect su
 - [x] Prepare an isolated candidate with unchanged committed FPS, quality and layout prerequisites.
 - [x] Complete exact-candidate automated checks, evidence review and README gate.
 - [x] Inspect the isolated staged diff; run the blocking public privacy gate immediately before the commit attempt.
-- [ ] Commit `feat: show stream bandwidth in MB/s` and push `main` to `origin/main`.
+- [x] Commit `feat: show stream bandwidth in MB/s` and push `main` to `origin/main`.
 
 Rollback removes only this commit's bitrate fields/props/UI/tests and matching docs; persisted data is unchanged. No app deployment target is configured in the baseline. Live user-desktop smoothness/audio and actual network download throughput remain unverified. Earlier verification paragraphs describe prior implementation phases; fresh isolated-candidate evidence follows before commit.
 
@@ -119,3 +119,11 @@ Final prerequisite advanced to `898197d` when its owning task committed channel 
 Deployment status changed externally during this commit workflow: the Vercel setup task linked `twitchgrid` to `main` and the channel-format owner verified its preceding commit deployed automatically. After this session's push, check the deployment's exact Git SHA and public assets; do not upload the shared dirty checkout. No extra implementation scope is added.
 
 Canonical incident review hashes after anonymization/tooling evidence: tooling`b468f7f5fa9497408ccef08fc222d6df72c2130c7a02d27658098f0dc4a311ab`, stutter`2f1da93dc1760326fa3c7aecad930b37f337019d30a41cfee941eb9a11ce942e`; targeted checks returned no errors/changed/unregistered aliases. These external knowledge updates are not bundled with the app commit.
+
+## Completed implementation milestone
+
+- [x] Public privacy gate passed against the exact isolated candidate; scoped commit `c3d9b38 feat: show stream bandwidth in MB/s` created with20 files (591 insertions,10 deletions).
+- [x] Push succeeded: `898197d..c3d9b38 main → origin/main`; default staging was refreshed only after proving no other staged changes, preserving all working-file bytes.
+- [x] Automatic Vercel Git deployment became READY for exact `c3d9b38c1620103e15cc43fcb2142310c4712832`. Production alias https://twitchgrid.vercel.app/ resolves to that deployment; HTML, JS and CSS returned200 and the served JS contains the bandwidth readout. Verified assets match the tested candidate bundle.
+
+A verifier initially assumed inspect JSON contains Git metadata; the tooling report records that assumption failure and corrected exact-SHA-listing/alias-URL check. The implementation did not change. A docs-only follow-up `docs: record bandwidth delivery verification` records actual commit/deployment evidence and that tooling outcome. No additional app tests are required because its source/test/CSS bytes remain identical to the145-unit/31-browser candidate. Next: push the documentation follow-up and verify its automatic deployment, reporting its final SHA/URL in Codex output. No original stutter/audio/actual-download-throughput acceptance is claimed. Unrelated baseline and other-task work remains dirty and excluded.
