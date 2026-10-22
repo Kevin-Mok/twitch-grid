@@ -5,7 +5,7 @@ test('default quality recovers when Twitch ignores the first setter without repl
   await fakeTwitch(page); await page.goto('/');
   await page.getByLabel('Channel or Twitch URL').fill('coachboop');
   await page.getByRole('button', { name: 'Add channels', exact: true }).click();
-  await expect(page.locator('[data-channel="coachboop"]')).toContainText('Live');
+  await expect(page.locator('[data-channel="coachboop"]').getByRole('img', { name: 'Live', exact: true })).toBeVisible();
   const frame = await page.locator('.video-host iframe').elementHandle();
   await page.evaluate(() => {
     const player = (window as unknown as { __players: Record<string, { quality: string; acknowledged?: boolean; getQuality(): string; getQualities(): { group: string }[]; setQuality(value: string): void }> }).__players.coachboop;
@@ -36,7 +36,7 @@ test('changing default quality applies to every stream and clears old overrides 
   await page.goto('/');
   await page.getByLabel('Channel or Twitch URL').fill('alpha bravo');
   await page.getByRole('button', { name: 'Add channels', exact: true }).click();
-  await expect(page.locator('[data-channel="bravo"]')).toContainText('Live');
+  await expect(page.locator('[data-channel="bravo"]').getByRole('img', { name: 'Live', exact: true })).toBeVisible();
   await page.evaluate(() => {
     const data = JSON.parse(localStorage.getItem('twitch-multiplayer:v2')!);
     data.session.channels[1].quality = '720p60';
@@ -44,7 +44,7 @@ test('changing default quality applies to every stream and clears old overrides 
   });
   await page.reload();
   const installQualities = async () => {
-    await expect(page.locator('[data-channel="bravo"]')).toContainText('Live');
+    await expect(page.locator('[data-channel="bravo"]').getByRole('img', { name: 'Live', exact: true })).toBeVisible();
     await page.evaluate(() => {
       const players = (window as unknown as { __players: Record<string, { getQualities(): { group: string; name: string }[] }> }).__players;
       for (const player of Object.values(players)) player.getQualities = () => [

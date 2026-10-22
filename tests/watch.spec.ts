@@ -94,7 +94,7 @@ test('five players retain iframe identity and navigation across all visual chang
 
 test('manual pause survives offline recovery; sound and quality stay independent', async ({ page }) => {
   await add(page, 'alpha bravo');
-  await expect(page.locator('[data-channel="alpha"]')).toContainText('Live');
+  await expect(page.locator('[data-channel="alpha"]').getByRole('img', { name: 'Live', exact: true })).toBeVisible();
   await page.evaluate(() => {
     const player = (window as unknown as { __players: Record<string, { pause(): void; emit(event: string): void }> }).__players.alpha;
     player.pause(); player.emit('offline'); player.emit('online');

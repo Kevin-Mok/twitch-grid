@@ -14,13 +14,13 @@ test('labels FPS within five seconds, clears paused estimates and preserves play
     const player = (window as unknown as { __players: Record<string, { getPlaybackStats?: () => unknown }> }).__players.alpha;
     player.getPlaybackStats = () => ({ fps: 60 });
   });
-  await expect(estimate).toHaveText('Twitch ~60 FPS', { timeout: 5000 });
+  await expect(estimate).toHaveText('60 FPS', { timeout: 5000 });
   await expect(estimate).toHaveAttribute('title', /does not measure displayed smoothness/);
   const qualityCalls = await page.evaluate(() => (window as unknown as { __calls: unknown[][] }).__calls.filter(call => call[0] === 'quality'));
   await page.evaluate(() => (window as unknown as { __players: Record<string, { pause(): void }> }).__players.alpha.pause());
   await expect(estimate).toHaveText('FPS —');
   await page.getByRole('button', { name: 'Play all paused streams', exact: true }).click();
-  await expect(estimate).toHaveText('Twitch ~60 FPS', { timeout: 5000 });
+  await expect(estimate).toHaveText('60 FPS', { timeout: 5000 });
   expect(await frame!.evaluate(el => el.isConnected)).toBe(true);
   const storedChannel = await page.evaluate(() => JSON.parse(localStorage.getItem('twitch-multiplayer:v2')!).session.channels[0]);
   expect(storedChannel).not.toHaveProperty('fps');

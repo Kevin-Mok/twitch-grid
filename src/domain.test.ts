@@ -53,10 +53,10 @@ describe('channel commands', () => {
     const session = populatedData().session;
     const result = addChannels(session, ' ALPHA, twitch.tv/gamma\n@delta beta');
     expect(result.channels.map((channel) => channel.login)).toEqual(['alpha', 'beta', 'gamma', 'delta']);
-    expect(result.channels[0]).toBe(session.channels[0]);
+    expect(result.channels[0]).toEqual({ ...session.channels[0], displayName: 'ALPHA' });
     expect(result.channels[2]).toEqual({ login: 'gamma', muted: true, volume: 1, quality: null, intent: 'playing' });
     expect(session.channels).toHaveLength(2);
-    expect(newChannel(' BETA ')).toEqual({ login: 'beta', muted: true, volume: 1, quality: null, intent: 'playing' });
+    expect(newChannel(' BETA ')).toEqual({ login: 'beta', displayName: 'BETA', muted: true, volume: 1, quality: null, intent: 'playing' });
   });
 
   it('rejects an invalid batch without adding its valid prefix', () => {
@@ -184,4 +184,14 @@ describe('public share codes', () => {
     const code = btoa(JSON.stringify(payload)).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
     expect(() => decodeShare(code)).toThrow(/share|code/i);
   });
+});
+
+it('preserves entered name casing through backups and updates casing without duplicating a channel', () => {
+  const data = defaultData();
+  data.session = addChannels(data.session, 'https://www.twitch.tv/Risezd @CoachBoop risezd');
+  expect(data.session.channels.map(c => [c.login, c.displayName])).toEqual([['risezd', 'Risezd'], ['coachboop', 'CoachBoop']]);
+  expect(parseBackup(JSON.stringify(data))).toEqual(data);
+  const old = addChannels(defaultData().session, 'risezd');
+  expect(addChannels(old, 'Risezd').channels).toEqual([{ ...old.channels[0], displayName: 'Risezd' }]);
+  expect(() => validateData({ ...data, session: { ...data.session, channels: [{ ...data.session.channels[0], displayName: 'SomeoneElse' }] } })).toThrow(/display name/i);
 });

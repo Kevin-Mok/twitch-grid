@@ -43,7 +43,7 @@ export function Sidebar({ data, setData, add, remove, clear, refresh, reorder, o
         const index = session.channels.findIndex(c => c.login === channel.login);
         return <li key={channel.login}>
           <span className="channel-avatar" aria-hidden="true">{channel.login.slice(0, 2).toUpperCase()}</span>
-          <button className="channel-name" title={`Open chat for ${channel.login}`} onClick={() => openChat(channel.login)}>{channel.login}<small>{channel.intent === 'paused' ? 'Paused' : channel.muted ? 'Muted' : 'Sound on'}</small></button>
+          <button className="channel-name" title={`Open chat for ${channel.login}`} onClick={() => openChat(channel.login)}>{channel.displayName ?? channel.login}<small>{channel.intent === 'paused' ? 'Paused' : channel.muted ? 'Muted' : 'Sound on'}</small></button>
           <div className="channel-actions"><button aria-label={`Reload hidden or visible ${channel.login}`} title="Reload this channel to check live status" onClick={() => refresh(channel.login)}>↻</button><button aria-label={`Move ${channel.login} up`} title="Move up" disabled={index === 0} onClick={() => reorder(channel.login, -1)}>↑</button><button aria-label={`Move ${channel.login} down`} title="Move down" disabled={index === session.channels.length - 1} onClick={() => reorder(channel.login, 1)}>↓</button><button aria-label={`Remove ${channel.login}`} title="Remove stream" onClick={() => remove(channel.login)}>×</button></div>
         </li>;
       })}

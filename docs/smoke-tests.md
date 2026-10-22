@@ -65,6 +65,12 @@ Use these checks against a static production build to verify actual viewing beha
 ## Twitch FPS estimate
 
 - Action: Add two live channels in a visible browser and start playback; inspect headers and hover the FPS readings.
-  Expected: Twitch ~… FPS appears within five seconds of valid provider stats becoming available, then refines over about ten seconds. The tooltip distinguishes provider playback from displayed smoothness. Unsupported stats show FPS —.
+  Expected: … FPS appears (provider identified by the tooltip and accessible label) within five seconds of valid provider stats becoming available, then refines over about ten seconds. The tooltip distinguishes provider playback from displayed smoothness. Unsupported stats show FPS —.
 - Action: Pause and resume a stream; change its quality; hide the tab for over ten seconds and return.
   Expected: Unavailable observations clear the estimate. Valid playback starts a new averaging window, with no automatic quality changes, storage writes or player reload.
+
+
+## Channel display names
+
+- Action: Add `Risezd` or `https://twitch.tv/Risezd`, then re-enter the same channel as `RiSeZd`. Open its chat, reload, and round-trip a JSON backup or saved profile. Also load an older backup with no display name.
+  Expected: Tile, sidebar and chat selection preserve entered spelling. Re-entry updates casing without duplicating or replacing the player; login identity remains `risezd`. Reload/profile/backup retain it. Older names fall back to lowercase; share links retain lowercase logins. Online tiles show the status dot without Live text, numeric estimates such as `25 FPS`. Offline/error/unknown labels stay visible; FPS tooltips still explain the provider estimate.

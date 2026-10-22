@@ -12,3 +12,5 @@ Use these local lessons when changing this app. Reproduce a boundary failure fir
 - Importing validated data does not grant permission to overwrite unreadable stored data. Keep the storage write gate until the explicit recovery action.
 - Build share URLs from the public payload, origin and pathname. Unrelated page queries may contain private data and must not propagate.
 - ONLINE, available qualities and a live thumbnail do not prove playback. Record advancing video separately from human audibility, and keep third-party visibility warnings unresolved until a discriminating check passes.
+
+- Removing a visible status label can break readiness checks in unrelated browser scenarios. Search all tests for the old text and use the retained accessible status indicator without weakening playback/quality assertions.

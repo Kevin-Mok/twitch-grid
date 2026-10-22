@@ -1,6 +1,7 @@
 export type LayoutMode = 'auto' | 1 | 2 | 3 | 4;
 export interface Channel {
   login: string;
+  displayName?: string;
   muted: boolean;
   volume: number;
   quality: string | null;
@@ -38,7 +39,7 @@ export function defaultData(): AppData {
   return { version: 2, session: defaultSession(), profiles: [], activeProfileId: null };
 }
 
-export function normalizeChannel(input: string): string {
+function channelName(input: string): string {
   let login = input.trim().replace(/^@/, '');
   if (/^(https?:\/\/|(?:www\.|m\.)?twitch\.tv\/)/i.test(login)) {
     let url: URL;
@@ -52,24 +53,35 @@ export function normalizeChannel(input: string): string {
     }
     login = match[1];
   }
-  login = login.toLowerCase();
-  if (!/^[a-z0-9_]{1,25}$/.test(login)) {
+  if (!/^[a-z0-9_]{1,25}$/i.test(login)) {
     throw new Error('A Twitch channel login must contain 1–25 letters, numbers, or underscores.');
   }
   return login;
 }
 
-export function newChannel(login: string): Channel {
-  return { login: normalizeChannel(login), muted: true, volume: 1, quality: null, intent: 'playing' };
+export function normalizeChannel(input: string): string {
+  return channelName(input).toLowerCase();
+}
+
+export function newChannel(input: string): Channel {
+  const name = channelName(input);
+  const login = name.toLowerCase();
+  return { login, ...(name !== login ? { displayName: name } : {}), muted: true, volume: 1, quality: null, intent: 'playing' };
 }
 
 export function addChannels(session: WatchSession, input: string): WatchSession {
-  const logins = input.split(/[\s,]+/).filter(Boolean).map(normalizeChannel);
-  if (!logins.length) throw new Error('Enter at least one Twitch channel.');
-  const existing = new Set(session.channels.map((channel) => channel.login));
-  const added = [...new Set(logins)].filter((login) => !existing.has(login));
-  if (session.channels.length + added.length > MAX_CHANNELS) throw new Error('A session can contain at most 32 channels.');
-  return added.length ? { ...session, channels: [...session.channels, ...added.map(newChannel)] } : session;
+  const incoming = input.split(/[\s,]+/).filter(Boolean).map(newChannel);
+  if (!incoming.length) throw new Error('Enter at least one Twitch channel.');
+  const channels = new Map(session.channels.map(channel => [channel.login, channel]));
+  for (const channel of incoming) {
+    const existing = channels.get(channel.login);
+    if (!existing) channels.set(channel.login, channel);
+    else if (channel.displayName && channel.displayName !== existing.displayName) {
+      channels.set(channel.login, { ...existing, displayName: channel.displayName });
+    }
+  }
+  if (channels.size > MAX_CHANNELS) throw new Error('A session can contain at most 32 channels.');
+  return { ...session, channels: [...channels.values()] };
 }
 
 export function moveChannel(session: WatchSession, login: string, direction: -1 | 1): WatchSession {
@@ -123,13 +135,18 @@ function channelList(input: unknown): Channel[] {
   if (!Array.isArray(input) || input.length > MAX_CHANNELS) throw new Error('A session must contain an array of at most 32 channels.');
   const logins = new Set<string>();
   return input.map((item) => {
-    const channel = object(item, 'Channel', ['login', 'muted', 'volume', 'quality', 'intent']);
+    const channel = object(item, 'Channel', ['login', 'displayName', 'muted', 'volume', 'quality', 'intent']);
     const channelLogin = login(channel.login);
     if (logins.has(channelLogin)) throw new Error(`Duplicate channel login: ${channelLogin}.`);
     logins.add(channelLogin);
+    if (channel.displayName !== undefined && (typeof channel.displayName !== 'string'
+      || !/^[a-z0-9_]{1,25}$/i.test(channel.displayName) || channel.displayName.toLowerCase() !== channelLogin)) {
+      throw new Error('Channel display name must match its login, ignoring capitalization.');
+    }
     if (channel.intent !== 'playing' && channel.intent !== 'paused') throw new Error('Channel intent must be playing or paused.');
     return {
       login: channelLogin,
+      ...(channel.displayName !== undefined ? { displayName: channel.displayName as string } : {}),
       muted: boolean(channel.muted, 'Channel muted'),
       volume: number(channel.volume, 'Channel volume', 0, 1),
       quality: channel.quality === null ? null : quality(channel.quality),

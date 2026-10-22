@@ -70,3 +70,13 @@ Fresh estimate verification: 148/148 unit tests across ten files, typecheck and 
 Final browser count captured explicitly: `npx playwright test --reporter=dot` exited 0, **33 passed (24.4s)**. This resolves the earlier missing summary line.
 
 Commit-session isolated candidate verification on HEAD 9fe9e73: **142/142 unit tests**, typecheck/build exit 0 and **29/29 browser tests**. This candidate includes only FPS work and already committed prerequisites; earlier 148/33 results describe the shared dirty checkout.
+
+
+## Channel name and status formatting
+
+The latest header refinement preserves entered capitalization in an optional validated display name while retaining lowercase channel identity. Existing lowercase entries can be updated by adding the same login with the desired casing. Tile/sidebar/chat labels use it; local data, profiles and JSON backups retain it. Older data remains valid. Share links retain their existing lowercase format. No authenticated or third-party metadata lookup is introduced.
+
+Online headers retain the accessible green status dot and omit the visible Live label. Numeric FPS now reads `60 FPS`; its tooltip and accessible label still identify Twitch's provider estimate and its limits. Offline, error, unknown and unavailable diagnostic states remain explicit. Verification evidence is maintained in [the channel formatting plan](../plans/channel-status-format.md).
+
+
+Commit-session standalone candidate on HEAD c7e00dc: npm test **143/143** across ten files; npm run build (including typecheck) exit 0; full npx playwright test **30/30** exit 0. Candidate excludes uncommitted bitrate/chat-crop/playback work. Its standalone channel-status scenario verifies casing re-entry, no duplicated/replaced iframe, sidebar/chat labels, accessible online status without visible Live and reload persistence. No real Twitch or screenshot check was performed.
