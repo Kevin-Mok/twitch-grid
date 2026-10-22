@@ -17,6 +17,8 @@ Use these checks against a static production build to verify actual viewing beha
 
 ## Layout, keyboard and chat
 
+- Action: Inspect the header logo on desktop and at 390px width.
+  Expected: Four squares retain their 2×2 formation, size and spacing; the top-left and bottom-right are Twitch purple (#9146ff), and the other two are white. Other app accents remain green.
 - Action: Open the app in a fresh browser tab, then open `/favicon.svg` on the same origin.
   Expected: The tab icon and SVG match the header's purple-and-white 2×2 logo.
 - Action: Check 1, 2, 3, 5 and 8 players at 1440×900 and 1280×800. Also inspect controls at widths 390 and 768. Try 1–4 columns and focus one stream.
