@@ -23,6 +23,53 @@ test('player videos fill header-only tiles without duplicate controls', async ({
   }
 });
 
+test('sidebar stream controls apply to the lineup and preserve player preferences', async ({ page }) => {
+  const controls = page.getByRole('region', { name: 'Stream Controls', exact: true });
+  const play = controls.getByRole('button', { name: 'Play all paused streams', exact: true });
+  const pause = controls.getByRole('button', { name: 'Pause all streams', exact: true });
+  const mute = controls.getByRole('button', { name: 'Mute all streams', exact: true });
+  const reload = controls.getByRole('button', { name: 'Reload all streams', exact: true });
+  for (const button of [play, pause, mute, reload]) await expect(button).toBeDisabled();
+
+  await add(page, 'alpha bravo');
+  await page.evaluate(() => {
+    const data = JSON.parse(localStorage.getItem('twitch-multiplayer:v2')!);
+    data.session.channels[0].quality = '720p60';
+    localStorage.setItem('twitch-multiplayer:v2', JSON.stringify(data));
+  });
+  await page.reload();
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __players?: Record<string, { paused: boolean }> }).__players?.bravo?.paused)).toBe(false);
+  const frames = await page.locator('.video-host iframe').elementHandles();
+  await page.evaluate(() => {
+    const player = (window as unknown as { __players: Record<string, { setMuted(value: boolean): void; pause(): void }> }).__players.alpha;
+    player.setMuted(false); player.pause();
+  });
+  await expect(page.locator('.channel-name').filter({ hasText: /^alpha/ })).toContainText('Paused');
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('twitch-multiplayer:v2')!).session.channels[0].muted)).toBe(false);
+  await page.getByLabel('Filter streams').fill('alpha');
+  await page.evaluate(() => { (window as unknown as { __calls: unknown[] }).__calls = []; });
+
+  await play.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.channel-name').filter({ hasText: /^alpha/ })).toContainText('Sound on');
+  const playCalls = await page.evaluate(() => (window as unknown as { __calls: unknown[][] }).__calls.filter(call => call[0] === 'play'));
+  expect(playCalls).toEqual([['play', 'alpha']]);
+
+  await pause.click();
+  await expect.poll(() => page.evaluate(() => Object.values((window as unknown as { __players: Record<string, { paused: boolean }> }).__players).map(player => player.paused))).toEqual([true, true]);
+  await mute.click();
+  await expect.poll(() => page.evaluate(() => Object.values((window as unknown as { __players: Record<string, { muted: boolean }> }).__players).map(player => player.muted))).toEqual([true, true]);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('twitch-multiplayer:v2')!).session.channels[0].quality)).toBe('720p60');
+  for (const frame of frames) expect(await frame.evaluate(node => node.isConnected)).toBe(true);
+
+  await reload.click();
+  await expect(page.locator('.video-host iframe')).toHaveCount(2);
+  for (const frame of frames) expect(await frame.evaluate(node => node.isConnected)).toBe(false);
+  await expect.poll(() => page.evaluate(() => Object.values((window as unknown as { __players: Record<string, { paused: boolean; muted: boolean; quality: string }> }).__players).map(player => ({ paused: player.paused, muted: player.muted, quality: player.quality })))).toEqual([
+    { paused: true, muted: true, quality: '720p60' }, { paused: true, muted: true, quality: 'auto' },
+  ]);
+});
+
 test('five players retain iframe identity and navigation across all visual changes', async ({ page }) => {
   const navigations: string[] = [];
   page.on('framenavigated', frame => { if (frame.url().startsWith('https://player.twitch.tv/?')) navigations.push(frame.url()); });
@@ -35,6 +82,7 @@ test('five players retain iframe identity and navigation across all visual chang
   await page.getByRole('button', { name: 'Toggle sidebar (Ctrl+B)', exact: true }).click();
   await page.getByRole('button', { name: 'Open chat for alpha', exact: true }).click();
   await page.getByRole('combobox', { name: 'Chat channel', exact: true }).selectOption('bravo');
+  await page.getByRole('button', { name: 'Toggle sidebar (Ctrl+B)', exact: true }).click();
   await page.getByRole('button', { name: 'Toggle chat', exact: true }).click();
   await page.getByLabel('Layout').selectOption('2');
   await page.getByRole('button', { name: 'Focus alpha', exact: true }).click();
@@ -55,7 +103,7 @@ test('manual pause survives offline recovery; sound and quality stay independent
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('twitch-multiplayer:v2')!).session.channels[0].muted)).toBe(false);
   await expect(page.locator('.channel-name').filter({ hasText: /^bravo/ })).toContainText('Muted');
   await page.getByLabel('Global quality preference').selectOption('720p60');
-  await page.getByRole('button', { name: 'Play paused', exact: true }).click();
+  await page.getByRole('button', { name: 'Play all paused streams', exact: true }).click();
   await expect(page.locator('.channel-name').filter({ hasText: /^alpha/ })).toContainText('Sound on');
   await expect.poll(() => page.evaluate(() => {
     const players = (window as unknown as { __players: Record<string, { paused: boolean; muted: boolean; quality: string }> }).__players;

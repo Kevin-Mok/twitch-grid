@@ -9,7 +9,7 @@ Use these checks against a static production build to verify actual viewing beha
 - Action: Add five distinct currently live channels. Record viewport, browser, hardware, quality preference and sampled actual qualities. In DevTools retain references to each `.video-host iframe` and observe frame navigation; reorder repeatedly, resize, toggle sidebar/chat, select different chats and change layout/focus.
   Expected: Retained video iframes stay connected under the same parent; no app-created replacement or reload occurs. Smoothness and upstream navigation are observations, not guarantees. Avoid screenshots of private chat/account state.
 - Action: Pause one stream manually. Change layout and chat. In a controlled fixture, emit OFFLINE then ONLINE for that channel; in a real channel wait for an actual transition if feasible.
-  Expected: Paused intent remains paused. “Play paused” resumes it only on request. A simulated transition proves application handling, not Twitch’s real event delivery.
+  Expected: Paused intent remains paused. “Play all paused streams” resumes it only on request. A simulated transition proves application handling, not Twitch’s real event delivery.
 - Action: Use Twitch’s built-in controls to unmute one video and adjust its volume/quality. Change layout and chat, then reload the page.
   Expected: Other streams retain sound choices and the changed audio settings persist. No extra controls or empty footer space appear below any video; native controls remain reachable. No chat or focus action unmutes another stream.
 - Action: Switch to another browser tab for at least a minute, then return. Repeat with a background window if useful.
@@ -17,20 +17,18 @@ Use these checks against a static production build to verify actual viewing beha
 
 ## Layout, keyboard and chat
 
-- Action: Inspect the header logo on desktop and at 390px width.
-  Expected: Four squares retain their 2×2 formation, size and spacing; the top-left and bottom-right are Twitch purple (#9146ff), and the other two are white. Other app accents remain green.
 - Action: Open the app in a fresh browser tab, then open `/favicon.svg` on the same origin.
-  Expected: The tab icon and SVG match the header's purple-and-white 2×2 logo.
+  Expected: The tab icon and SVG retain a purple-and-white 2×2 logo. Normal viewing has no app header logo or title row.
 - Action: Check 1, 2, 3, 5 and 8 players at 1440×900 and 1280×800. Also inspect controls at widths 390 and 768. Try 1–4 columns and focus one stream.
   Expected: Video viewports remain at least 400×300; the canvas scrolls when needed. Rows are centered and do not overlap; ordinary app controls remain reachable. Desktop is the primary target.
-- Action: Press Ctrl+B while editing the channel input, then focus a toolbar button and press it again.
+- Action: Press Ctrl+B while editing the channel input, then focus the sidebar toggle button and press it again.
   Expected: Text editing does not toggle the sidebar. Outside editable controls the shortcut toggles it.
 - Action: Open chat for A, switch to B using the header dropdown with mouse and keyboard, drag the divider, use its left/right arrow keys, collapse/reopen, then remove the selected channel.
   Expected: One dropdown stays in the header before and after frame load, with no extra selector row. One chat embed follows the selected channel; width persists. Video hosts and audio remain unchanged. Removed channels resolve to another present channel or the empty state.
 - Action: Try Twitch chat login in your usual privacy configuration.
   Expected: The compact header dropdown stays available; login help closes on frame load. Chat help reopens/minimizes the cookie guidance and external “Open chat on Twitch” fallback without reloading chat. Switching channels closes help when the new frame loads. Frame load is not proof of login or messaging success: test normal Twitch interaction separately where the browser allows it. The app does not read messages or access the chat DOM.
 - Action: At widths 390, 768, 1280 and 1440, open two streams and chat, then choose Maximize video. Restore with Restore workspace and repeat using Escape while an app control has focus.
-  Expected: The app header, toolbar, sidebar and bottom status bar disappear; the video canvas gains their vertical space. Chat and player controls stay available, and the restore button remains reachable. Restoring returns the original sidebar preference. Existing video and chat frames stay connected with unchanged audio. Escape inside Twitch’s own iframe may be handled by Twitch; Restore workspace still works. Minimum player size, aspect ratio and scrolling remain unchanged.
+  Expected: The header, toolbar and bottom status strip are absent by default, and the workspace fills the browser height. Maximize video hides the sidebar; Restore workspace returns it. Chat and player controls stay available, and the restore button remains reachable. Restoring returns the original sidebar preference. Existing video and chat frames stay connected with unchanged audio. Escape inside Twitch’s own iframe may be handled by Twitch; Restore workspace still works. Minimum player size, aspect ratio and scrolling remain unchanged.
 
 ## Data and recovery
 
@@ -51,3 +49,6 @@ Use these checks against a static production build to verify actual viewing beha
   Expected: Vite preserves the first listener, selects another port and prints that URL.
 - Action: Serve only `dist` on a static host at a different hostname. Open a valid share fragment directly.
   Expected: App assets load without an app backend, secret or dev proxy. Each embed uses the current hostname; ancestor hosts require public `VITE_TWITCH_PARENTS` configuration. The new origin has separate local data.
+
+- Action: Open sidebar Settings at desktop and phone widths. Use Share and Backup & import, change Layout, toggle Chat, then close and reopen the sidebar with its menu button or Ctrl+B.
+  Expected: Both transfer dialogs open and close normally, workspace controls remain reachable, and video/chat embeds stay mounted. Storage failures still show an actionable warning.

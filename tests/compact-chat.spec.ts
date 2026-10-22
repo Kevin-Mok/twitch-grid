@@ -21,7 +21,6 @@ test('compact chat and maximize video retain embeds at supported widths', async 
   const frames = await page.locator('.video-host iframe, .chat-frame').elementHandles();
   for (const width of [390, 768, 1280, 1440]) {
     await page.setViewportSize({ width, height: 900 });
-    const before = (await page.locator('.player-viewport').boundingBox())!;
     const collapsed = (await chat.boundingBox())!.height;
     if (width === 390 || width === 1440) await page.screenshot({ path: testInfo.outputPath(`compact-${width}.png`) });
     await expect(page.getByRole('combobox', { name: 'Chat channel', exact: true })).toBeVisible();
@@ -29,6 +28,7 @@ test('compact chat and maximize video retain embeds at supported widths', async 
     await expect(page.getByRole('link', { name: 'Open chat on Twitch' })).toBeVisible();
     expect((await chat.boundingBox())!.height).toBeLessThan(collapsed);
     await page.getByRole('button', { name: 'Chat help', exact: true }).click();
+    await page.getByRole('button', { name: 'Toggle sidebar (Ctrl+B)', exact: true }).click();
     await page.getByRole('button', { name: 'Maximize video', exact: true }).click();
     await expect(page.locator('.app-header')).toBeHidden();
     await expect(page.locator('.watch-toolbar')).toBeHidden();
@@ -38,15 +38,17 @@ test('compact chat and maximize video retain embeds at supported widths', async 
     const bounds = (await restore.boundingBox())!;
     expect(bounds.x).toBeGreaterThanOrEqual(0);
     expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
-    await expect.poll(async () => (await page.locator('.player-viewport').boundingBox())!.height).toBeGreaterThan(before.height + 100);
+    expect((await page.locator('.watch-content').boundingBox())!.height).toBe(900);
     if (width === 390 || width === 1440) await page.screenshot({ path: testInfo.outputPath(`maximized-${width}.png`) });
     // Escape must restore even while a normal app select has keyboard focus.
     await page.getByRole('combobox', { name: 'Chat channel', exact: true }).focus();
     await page.keyboard.press('Escape');
-    await expect(page.locator('.watch-toolbar')).toBeVisible();
+    await expect(page.locator('.sidebar')).toBeVisible();
+    await page.getByRole('button', { name: 'Toggle sidebar (Ctrl+B)', exact: true }).click();
     for (const frame of frames) expect(await frame.evaluate(node => node.isConnected)).toBe(true);
   }
+  await page.getByRole('button', { name: 'Toggle sidebar (Ctrl+B)', exact: true }).click();
   await page.getByRole('button', { name: 'Maximize video', exact: true }).click();
   await page.getByRole('button', { name: 'Restore workspace', exact: true }).click();
-  await expect(page.locator('.app-header')).toBeVisible();
+  await expect(page.locator('.sidebar')).toBeVisible();
 });

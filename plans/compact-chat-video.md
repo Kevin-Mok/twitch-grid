@@ -63,3 +63,7 @@ Milestone subject: `feat: compact chat help and maximize video space`.
 - Rollback: a normal follow-up revert can undo this focused commit. Never reset unrelated dirty work or reverse prerequisite commits.
 
 Privacy review: the initial exact-index gate blocked a home-directory path in this plan. Replaced it with a repository-relative report reference; the mandatory gate will rerun on the final staged bytes before the commit. The shipping incident canonical memory check passed with zero errors.
+
+## Full-height workspace follow-up
+
+The workspace-height session removes app bars by default and moves Maximize video into sidebar Settings. Its compact-chat browser assertions now check full workspace height, sidebar restoration and retained embeds instead of expecting the removed toolbar to return or an additional 100px vertical gain. See plans/reclaim-video-space.md for scoped evidence.

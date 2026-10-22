@@ -35,7 +35,8 @@ test('blocked storage keeps the app usable and warns before the page closes', as
   await expect(page.getByRole('alert')).toContainText('storage');
   await add(page, 'alpha');
   await expect(page.locator('.video-host iframe')).toHaveCount(1);
-  await expect(page.getByText('Memory only', { exact: true })).toBeVisible();
+  await expect(page.getByRole('alert')).toContainText('Changes stay in memory');
+  await expect(page.getByRole('button', { name: 'Back up data', exact: true })).toBeVisible();
 });
 
 test('JSON backup download and explicit replacement restore the profile and channel order', async ({ page }) => {
@@ -106,6 +107,8 @@ for (const width of [390, 768]) {
     await expect(page.getByRole('button', { name: 'Toggle sidebar (Ctrl+B)', exact: true })).toBeVisible();
     await add(page, 'alpha');
     await page.getByRole('button', { name: 'Toggle sidebar (Ctrl+B)', exact: true }).click();
+    await page.getByRole('button', { name: 'Toggle sidebar (Ctrl+B)', exact: true }).click();
+    await page.getByRole('button', { name: 'Share', exact: true }).scrollIntoViewIfNeeded();
     await expect(page.getByRole('button', { name: 'Share', exact: true })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   });
