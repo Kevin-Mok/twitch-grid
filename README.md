@@ -54,7 +54,7 @@ Preview prefers `http://127.0.0.1:4173` and also prints its selected port. `npm 
 2. Use the sidebar arrows to reorder. Auto grid fits tiles without cropping. If minimum video sizes cannot fit, the canvas scrolls. Choose 1–4 columns or enlarge a tile with its focus control.
 3. Each footer has play/pause, mute, volume, quality preference, status sample and explicit reload. The actual quality appears separately. “Use default” follows the global preference; a per-stream choice overrides it. An unavailable preference falls back to `auto`, then the first supported quality, with a visible explanation.
 4. “Play paused” also offers a gesture to start blocked playback. “Pause all” and “Mute all” act independently. Selecting or opening chat never unmutes a stream.
-5. Open a stream’s chat, choose another channel, collapse it, or drag its divider. The divider also responds to left/right arrows. Chat login depends on Twitch and browser cookie policy; use “Open chat on Twitch” if the embed cannot sign in.
+5. Open a stream’s chat and use the dropdown in its header to switch channels. Use the header arrow to collapse chat, or drag its divider to resize. The divider also responds to left/right arrows. Chat login depends on Twitch and browser cookie policy; use “Open chat on Twitch” if the embed cannot sign in.
 6. Save named profiles. Load preserves overlapping player instances. “Update selected profile” explicitly saves edits to its lineup/settings; rename and delete are separate controls.
 
 `Ctrl+B` (or `Cmd+B`) toggles the sidebar outside text fields. Escape exits focus mode. The workspace and individual players have fullscreen controls. Removing a stream or clearing the lineup offers Undo; clearing and deleting profiles require confirmation.

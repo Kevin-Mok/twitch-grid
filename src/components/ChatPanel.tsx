@@ -17,8 +17,10 @@ export function ChatPanel({ settings, channels, update }: Props) {
       onPointerDown={event => { drag.current = { x: event.clientX, width: settings.width }; event.currentTarget.setPointerCapture(event.pointerId); }}
       onPointerMove={event => { if (drag.current) resize(drag.current.width + drag.current.x - event.clientX); }}
       onPointerUp={() => { drag.current = null; }} onPointerCancel={() => { drag.current = null; }} />
-    <div className="chat-header"><span className="eyebrow">STREAM CHAT</span><button aria-label="Collapse chat" title="Collapse chat" onClick={() => update({ ...settings, open: false })}>→</button></div>
-    <div className="chat-channel"><span className="chat-hash">#</span><select aria-label="Chat channel" value={selected ?? ''} onChange={event => update({ ...settings, channel: event.target.value || null })}><option value="" disabled>Choose a channel</option>{channels.map(c => <option key={c.login} value={c.login}>{c.login}</option>)}</select></div>
+    <div className="chat-header">
+      <label className="chat-channel-select"><span className="chat-hash" aria-hidden="true">#</span><select aria-label="Chat channel" value={selected ?? ''} onChange={event => update({ ...settings, channel: event.target.value || null })}><option value="" disabled>Choose a channel</option>{channels.map(c => <option key={c.login} value={c.login}>{c.login}</option>)}</select></label>
+      <button aria-label="Collapse chat" title="Collapse chat" onClick={() => update({ ...settings, open: false })}>→</button>
+    </div>
     {configError ? <p role="alert">{configError}</p> : selected ? <iframe className="chat-frame" title={`Twitch chat for ${selected}`} src={url} /> : <div className="chat-empty"><h3>A place for the conversation.</h3><p>Add a stream, then choose its chat.</p></div>}
     <div className="chat-note"><p>Login or chat unavailable? Your browser may restrict embedded cookies.</p>{selected && <a href={twitchChat.externalUrl(selected)} target="_blank" rel="noopener noreferrer">Open chat on Twitch ↗</a>}</div>
   </aside>;

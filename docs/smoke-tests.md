@@ -25,8 +25,8 @@ Use these checks against a static production build to verify actual viewing beha
   Expected: Video viewports remain at least 400×300; the canvas scrolls when needed. Rows are centered and do not overlap; ordinary app controls remain reachable. Desktop is the primary target.
 - Action: Press Ctrl+B while editing the channel input, then focus a toolbar button and press it again.
   Expected: Text editing does not toggle the sidebar. Outside editable controls the shortcut toggles it.
-- Action: Open chat for A, switch to B, drag the divider, use its left/right arrow keys, collapse/reopen, then remove the selected channel.
-  Expected: One chat embed follows the selected channel; width persists. Video hosts and audio remain unchanged. Removed channels resolve to another present channel or the empty state.
+- Action: Open chat for A, switch to B using the header dropdown with mouse and keyboard, drag the divider, use its left/right arrow keys, collapse/reopen, then remove the selected channel.
+  Expected: One dropdown stays in the header before and after frame load, with no extra selector row. One chat embed follows the selected channel; width persists. Video hosts and audio remain unchanged. Removed channels resolve to another present channel or the empty state.
 - Action: Try Twitch chat login in your usual privacy configuration.
   Expected: Normal Twitch interaction works where the browser allows it. The external “Open chat on Twitch” fallback remains available; the app does not read messages or access the chat DOM.
 
