@@ -8,7 +8,7 @@ Validation: the isolated viewport-fitting candidate passes 130 unit/integration 
 
 **Known issue:** a desktop user reported that `mrsavage` keeps playing while starting `coachboop` plays briefly and stops. Simultaneous real playback is unresolved; fixture test success does not establish that this core workflow works. See the [open playback investigation](docs/postmortem/2026-10-22-simultaneous-playback.md).
 
-## Stack and why
+## Tech Stack and Why Chosen
 
 | Layer | Choice | Reason |
 | --- | --- | --- |
@@ -48,11 +48,11 @@ npm run preview
 
 Preview prefers `http://127.0.0.1:4173` and also prints its selected port. `npm run inspect` lists the built files and verifies that the HTML’s asset references resolve; `-- --plain` uses ASCII labels and separators. It does not prove real Twitch playback.
 
-## Everyday use
+## Everyday Usage
 
 1. Add channel names or Twitch URLs. Commas and whitespace separate entries; duplicate channels are ignored. New streams start muted.
 2. Use the sidebar arrows to reorder. The desktop sidebar is 200px wide and new chat panels start at 240px. Wider saved chat preferences are capped to reserve two video columns where space permits; widening the window restores the preferred width. Four streams with chat use a 2×2 Auto grid from 1280px at normal browser zoom, including with a capped wide chat preference. The entire video grid scales proportionally to fit one viewport, including headers and gaps, without canvas scrolling. Twitch's internal embed minimums are preserved; controls appear smaller in short windows or large lineups. Choose 1–4 columns or enlarge a tile with its focus control.
-3. Use Twitch’s built-in controls inside each video for play/pause, mute, volume and quality. There is no extra control bar below players. Channel headers keep chat, focus, fullscreen and remove actions; reload individual streams from the sidebar. Saved audio preferences remain supported; the sidebar sets the default quality for streams without saved overrides.
+3. Use Twitch’s built-in controls inside each video for play/pause, mute, volume and quality. There is no extra control bar below players. Channel headers keep chat, focus, fullscreen and remove actions; reload individual streams from the sidebar. Saved audio preferences remain supported; changing the sidebar default quality applies it to every current stream.
 4. The sidebar’s **Stream Controls** section provides “Play all paused streams”, “Pause all streams”, “Mute all streams” and “Reload all streams”. They act on the full lineup, including channels excluded by the sidebar filter, and are disabled when the lineup is empty. Play also offers a gesture to start blocked playback; pause and mute act independently. Reload recreates every player while preserving saved playback, sound and quality preferences. The top bars and bottom status strip are removed so the workspace uses the full browser height. Open the sidebar to access workspace controls. Selecting or opening chat never unmutes a stream.
 5. Open a stream’s chat and use the dropdown in its header to switch channels. Login help automatically closes when the chat frame loads; loading does not prove login or messaging works. **Chat help** reopens or minimizes the cookie guidance and “Open chat on Twitch” fallback. Drag the divider or use its left/right arrows to resize; the arrow in the chat header closes the panel.
 6. Use **Maximize video** in sidebar **Settings** to hide the sidebar. **Restore workspace** or Escape brings it back without reloading embeds or changing saved sidebar preferences. Video keeps its proportions and all rows fit the available height.
@@ -60,7 +60,7 @@ Preview prefers `http://127.0.0.1:4173` and also prints its selected port. `npm 
 
 The sidebar uses compact text and spacing, with channel actions beside names so more streams fit vertically.
 
-Unavailable quality preferences fall back silently to an available quality. Quality fallback banners are hidden; player errors remain visible.
+Default resolution labels such as 360p and 480p match Twitch's corresponding `360p30` and `480p30` rendition IDs. Changing Default quality applies it to every current stream and clears older per-stream overrides; the updated lineup persists locally. Saved profiles keep their settings until explicitly updated. The manager makes up to three attempts to apply a quality request and reapplies after an offline/online recovery. Once acknowledged, native Twitch quality changes remain usable. Unavailable preferences fall back silently; player errors remain visible.
 
 `Ctrl+B` (or `Cmd+B`) toggles the sidebar outside text fields. Escape exits focus mode. Sidebar **Settings** contains Layout, Chat, Maximize video, Fullscreen, Share and Backup & import. The floating menu button reopens a normally closed sidebar; maximized mode has Restore workspace. Individual players also have fullscreen controls. Removing a stream or clearing the lineup offers Undo; clearing and deleting profiles require confirmation.
 
@@ -99,7 +99,7 @@ There are no application API routes, serverless/edge functions, SSR, hosted data
 
 Twitch receives `window.location.hostname` as its embed parent, covering localhost, current preview domains and production domains. If the app itself is embedded under other ancestors, set the optional public build variable `VITE_TWITCH_PARENTS` to their comma-separated hostnames (no protocol, path or port). Use HTTPS outside local development. `VITE_` values are visible in the bundle and must never contain secrets. [Twitch video requirements](https://dev.twitch.tv/docs/embed/video-and-clips/) and [chat parameters](https://dev.twitch.tv/docs/embed/chat/).
 
-## Development checks
+## Development Command Reference
 
 ```sh
 npm test

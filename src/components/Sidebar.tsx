@@ -61,8 +61,8 @@ export function Sidebar({ data, setData, add, remove, clear, refresh, reorder, o
         <button aria-label="Backup & import" onClick={() => onTransfer('backup')}>⇅ Backup & import</button>
       </div>
       <label className="check-label"><input type="checkbox" checked={session.hideOffline} onChange={e => setData({ ...data, session: { ...session, hideOffline: e.target.checked } })} />Hide offline streams</label>
-      <label className="quality-setting">Default quality<select aria-label="Global quality preference" value={session.globalQuality} onChange={e => setData({ ...data, session: { ...session, globalQuality: e.target.value } })}>{[...new Set(['auto', 'chunked', '1080p60', '1080p', '720p60', '720p', '480p', '360p', '160p', 'audio_only', session.globalQuality])].map(q => <option key={q} value={q}>{q === 'auto' ? 'Auto' : q === 'chunked' ? 'Source' : q === 'audio_only' ? 'Audio only' : q}</option>)}</select></label>
-      <p>Applies to streams set to “Use default”.</p>
+      <label className="quality-setting">Default quality<select aria-label="Global quality preference" value={session.globalQuality} onChange={e => setData({ ...data, session: { ...session, globalQuality: e.target.value, channels: session.channels.map(channel => ({ ...channel, quality: null })) } })}>{[...new Set(['auto', 'chunked', '1080p60', '1080p', '720p60', '720p', '480p', '360p', '160p', 'audio_only', session.globalQuality])].map(q => <option key={q} value={q}>{q === 'auto' ? 'Auto' : q === 'chunked' ? 'Source' : q === 'audio_only' ? 'Audio only' : q}</option>)}</select></label>
+      <p>Changing this applies to every stream and clears saved stream overrides.</p>
       {session.hideOffline && <p>Live return is best effort. Use a channel’s ↻ to recheck it without reloading others.</p>}
     </section>
     <section className="profiles">

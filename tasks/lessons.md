@@ -6,6 +6,8 @@ Use these local lessons when changing this app. Reproduce a boundary failure fir
 - ResizeObserver contentRect already excludes padding. Use its dimensions directly; regression checks for reserved grid space must assert row/column geometry, since a one-column stack can also have no horizontal overflow.
 - When fitting a scaled video grid, verify visible bounds with getBoundingClientRect and Twitch's internal embed minimums with offsetWidth/offsetHeight. A displayed 300px minimum contradicts fitting multiple rows into short viewports.
 - SDK setter calls cross an asynchronous frame boundary. Do not overwrite saved audio targets with pre-acknowledgment samples, or mark a quality applied before its handle exists.
+- Sidebar quality labels can omit Twitch's `30` FPS suffix. Prefer an exact available ID, then its equivalent 30fps rendition; otherwise a valid 360p choice silently becomes Auto. Keep explicit 60fps choices and per-stream overrides independent.
+- A sent quality command is not an acknowledgement. Send changed targets even if cached state already matches, acknowledge only a later sample, bound pending retries, and stop retrying after acknowledgement so native controls stay usable. Test old saved overrides in the actual UI as well as fresh player contexts.
 - Unknown player state is not offline. A valid sample after an observation failure clears the error without inventing ONLINE evidence.
 - Importing validated data does not grant permission to overwrite unreadable stored data. Keep the storage write gate until the explicit recovery action.
 - Build share URLs from the public payload, origin and pathname. Unrelated page queries may contain private data and must not propagate.

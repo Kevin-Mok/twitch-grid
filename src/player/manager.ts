@@ -3,10 +3,13 @@ import type { PlayerEvent, PlayerFactory, PlayerHandle, PlayerSlot, PlayerSnapsh
 import { twitchStatusProvider } from './status';
 
 export function chooseQuality(preference: string, qualities: string[]): string | null {
-  return qualities.includes(preference) ? preference : qualities.includes('auto') ? 'auto' : qualities[0] ?? null;
+  if (qualities.includes(preference)) return preference;
+  const thirtyFps = /^\d+p$/.test(preference) ? `${preference}30` : null;
+  return (thirtyFps && qualities.includes(thirtyFps) ? thirtyFps : null)
+    ?? (qualities.includes('auto') ? 'auto' : qualities[0] ?? null);
 }
 
-type Entry = PlayerSlot & { handle?: PlayerHandle; ready: boolean; disposed: boolean; appliedQuality: string | null; pendingMuted: boolean | null; pendingVolume: number | null };
+type Entry = PlayerSlot & { handle?: PlayerHandle; ready: boolean; disposed: boolean; requestedQuality: string | null; qualityAttempts: number | null; pendingMuted: boolean | null; pendingVolume: number | null };
 const initialSnapshot = (): PlayerSnapshot => ({ live: 'unknown', playback: 'loading', quality: 'unknown', qualities: [], fallback: null, error: null, lastSignal: Date.now(), audioPending: false });
 
 export class PlayerManager {
@@ -23,6 +26,7 @@ export class PlayerManager {
 
   sync(channels: Channel[], globalQuality: string): void {
     if (this.closed) return;
+    const qualityChanged = this.globalQuality !== globalQuality;
     this.globalQuality = globalQuality;
     const keep = new Set(channels.map(channel => channel.login));
     for (const [login, entry] of this.entries) {
@@ -33,6 +37,7 @@ export class PlayerManager {
       if (!entry) { this.create(channel); continue; }
       const previous = entry.channel;
       entry.channel = { ...channel };
+      if ((qualityChanged && channel.quality === null) || previous.quality !== channel.quality) entry.requestedQuality = null;
       if (entry.ready && entry.handle) {
         if (previous.muted !== channel.muted) { entry.pendingMuted = channel.muted; entry.handle.setMuted(channel.muted); }
         if (previous.volume !== channel.volume) { entry.pendingVolume = channel.volume; entry.handle.setVolume(channel.volume); }
@@ -53,7 +58,7 @@ export class PlayerManager {
     const header = document.createElement('div'); header.className = 'tile-header';
     const host = document.createElement('div'); host.className = 'video-host';
     element.append(header, host);
-    const entry: Entry = { channel: { ...channel }, element, host, header, snapshot: initialSnapshot(), ready: false, disposed: false, appliedQuality: null, pendingMuted: channel.muted, pendingVolume: channel.volume };
+    const entry: Entry = { channel: { ...channel }, element, host, header, snapshot: initialSnapshot(), ready: false, disposed: false, requestedQuality: null, qualityAttempts: null, pendingMuted: channel.muted, pendingVolume: channel.volume };
     this.entries.set(channel.login, entry);
     this.surface.append(element);
     this.factory(host, channel.login, event => this.event(entry, event)).then(handle => {
@@ -83,12 +88,21 @@ export class PlayerManager {
     else entry.handle?.play();
   }
 
-  private applyQuality(entry: Entry): void {
+  private applyQuality(entry: Entry, retry = false): void {
     const preference = entry.channel.quality ?? this.globalQuality;
     const selected = chooseQuality(preference, entry.snapshot.qualities);
-    entry.snapshot.fallback = selected && selected !== preference ? `${preference} unavailable; using ${selected}` : null;
-    if (selected && entry.appliedQuality !== selected && entry.ready && entry.handle) {
-      entry.appliedQuality = selected;
+    entry.snapshot.fallback = selected && selected !== preference && selected !== `${preference}30` ? `${preference} unavailable; using ${selected}` : null;
+    if (!selected || !entry.ready || !entry.handle) return;
+    if (entry.requestedQuality !== selected) {
+      entry.requestedQuality = selected; entry.qualityAttempts = 1;
+      entry.handle.setQuality(selected);
+      return;
+    }
+    if (!retry || entry.qualityAttempts === null) return;
+    if (entry.snapshot.quality === selected) { entry.qualityAttempts = null; return; }
+    // Retry only unacknowledged requests; native quality changes after acknowledgement remain usable.
+    if (entry.qualityAttempts < 3) {
+      entry.qualityAttempts++;
       entry.handle.setQuality(selected);
     }
   }
@@ -96,6 +110,7 @@ export class PlayerManager {
   private event(entry: Entry, event: PlayerEvent): void {
     if (entry.disposed) return;
     const state = entry.snapshot;
+    const reconnecting = event.type === 'online' && state.live === 'offline';
     state.live = twitchStatusProvider.observe(state.live, event.type);
     if (event.type !== 'sample') state.lastSignal = Date.now();
     switch (event.type) {
@@ -104,6 +119,7 @@ export class PlayerManager {
         break;
       case 'online':
         state.error = null;
+        if (reconnecting) entry.requestedQuality = null;
         if (entry.channel.intent === 'paused') entry.handle?.pause();
         break;
       case 'offline': state.error = null; break;
@@ -141,7 +157,7 @@ export class PlayerManager {
         } else if (Math.abs(entry.channel.volume - event.volume) > 0.015) patch.volume = event.volume;
         state.audioPending = entry.pendingMuted !== null || entry.pendingVolume !== null;
         if (Object.keys(patch).length) { Object.assign(entry.channel, patch); this.observed(entry.channel.login, patch); }
-        this.applyQuality(entry);
+        this.applyQuality(entry, true);
         break;
       }
     }

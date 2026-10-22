@@ -4,6 +4,9 @@ Use these checks against a static production build to verify actual viewing beha
 
 ## Real Twitch playback and lifecycle
 
+- Action: With two live streams, including an older saved quality override, change Default quality to Auto, then 360p, 480p and Auto. Inspect Twitch's native quality menu after each change; choose 360p again and reload. In the fixture, ignore the first quality setter, then acknowledge a retry; also exercise OFFLINE→ONLINE recovery and a native quality change after acknowledgement.
+  Expected: Every current stream follows the changed default; old current-lineup overrides are cleared and remain cleared after reload. Available 360p/480p renditions match Twitch's `360p30`/`480p30` IDs; Auto returns control to Twitch. Existing frames remain mounted and saved profiles retain separately saved settings until updated. Pending requests receive at most three attempts; acknowledged native choices survive ordinary rendering/playback events. Recovery reapplies the preference. Unavailable renditions fall back silently. Native menu selection and actual moving video/audio are separate observations.
+
 - Action: Select a quality unavailable on a loaded stream, toggle the sidebar, then choose a different unavailable quality. Also check a player error when one is available.
   Expected: No quality fallback banner appears, including immediately after selection and through UI updates. Playback continues using an available quality; errors remain visible.
 

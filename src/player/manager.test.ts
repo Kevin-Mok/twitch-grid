@@ -130,6 +130,77 @@ describe('persistent player manager', () => {
     manager.sync([channel('alpha')], '720p60'); await tick();
     expect(qualities).toEqual(['720p60']); manager.destroy();
   });
+  it('applies a resolution default to Twitch 30fps IDs while preserving a stream override', async () => {
+    const f = fixture();
+    const channels = [channel('alpha'), { ...channel('bravo'), quality: '720p60' }];
+    f.manager.sync(channels, '360p'); await tick();
+    for (const login of ['alpha', 'bravo']) {
+      const emit = f.emitters.get(login)!;
+      emit({ type: 'ready' });
+      emit({ type: 'sample', muted: true, volume: 0.5, paused: false, quality: 'chunked', qualities: ['auto', 'chunked', '720p60', '480p30', '360p30'] });
+    }
+    expect(f.calls.filter(call => call.startsWith('quality:'))).toEqual(['quality:alpha:360p30', 'quality:bravo:720p60']);
+    expect(f.manager.slots().map(slot => slot.snapshot.fallback)).toEqual([null, null]);
+    const before = f.calls.length;
+    f.manager.sync(channels, '480p');
+    expect(f.calls.slice(before)).toEqual(['quality:alpha:480p30']);
+    f.manager.destroy();
+  });
+  it('retries an ignored quality command on samples until acknowledged, then respects native choices', async () => {
+    const f = fixture(); const channels = [channel('alpha')];
+    f.manager.sync(channels, '360p'); await tick();
+    const emit = f.emitters.get('alpha')!;
+    const sample = (quality: string) => emit({ type: 'sample', muted: true, volume: 0.5, paused: false, quality, qualities: ['auto', 'chunked', '360p30'] });
+    emit({ type: 'ready' }); sample('chunked');
+    const before = f.calls.length;
+    f.manager.sync(channels, '360p'); f.manager.sync(channels, '360p');
+    expect(f.calls.slice(before)).toEqual([]);
+    sample('chunked');
+    expect(f.calls.slice(before)).toEqual(['quality:alpha:360p30']);
+    sample('360p30');
+    const acknowledged = f.calls.length;
+    sample('chunked'); f.manager.sync(channels, '360p');
+    expect(f.calls.slice(acknowledged)).toEqual([]);
+    f.manager.destroy();
+  });
+  it('bounds unacknowledged quality attempts and starts a new request when the default changes', async () => {
+    const f = fixture(); const channels = [channel('alpha')];
+    f.manager.sync(channels, '360p'); await tick();
+    const emit = f.emitters.get('alpha')!;
+    emit({ type: 'ready' });
+    for (let i = 0; i < 8; i++) emit({ type: 'sample', muted: true, volume: 0.5, paused: false, quality: 'chunked', qualities: ['auto', 'chunked', '360p30', '480p30'] });
+    expect(f.calls.filter(call => call === 'quality:alpha:360p30')).toHaveLength(3);
+    f.manager.sync(channels, '480p');
+    expect(f.calls.at(-1)).toBe('quality:alpha:480p30');
+    f.manager.destroy();
+  });
+  it('reapplies a changed default even when a cleared override resolved to the same rendition', async () => {
+    const f = fixture();
+    f.manager.sync([{ ...channel('alpha'), quality: '360p30' }], 'auto'); await tick();
+    const emit = f.emitters.get('alpha')!;
+    const sample = (quality: string) => emit({ type: 'sample', muted: true, volume: 0.5, paused: false, quality, qualities: ['auto', 'chunked', '360p30'] });
+    emit({ type: 'ready' }); sample('chunked'); sample('360p30'); sample('chunked');
+    const before = f.calls.length;
+    f.manager.sync([channel('alpha')], '360p');
+    expect(f.calls.slice(before)).toEqual(['quality:alpha:360p30']);
+    f.manager.destroy();
+  });
+  it('reapplies quality after a live reconnection without changing native quality on ordinary playback events', async () => {
+    const f = fixture(); f.manager.sync([channel('alpha')], '360p'); await tick();
+    const emit = f.emitters.get('alpha')!;
+    const sample = (quality: string) => emit({ type: 'sample', muted: true, volume: 0.5, paused: false, quality, qualities: ['auto', 'chunked', '360p30'] });
+    emit({ type: 'ready' }); sample('chunked'); sample('360p30');
+    const before = f.calls.length;
+    emit({ type: 'playing' }); sample('chunked');
+    expect(f.calls.slice(before)).toEqual([]);
+    emit({ type: 'offline' }); emit({ type: 'online' }); sample('chunked');
+    expect(f.calls.slice(before)).toEqual(['quality:alpha:360p30']);
+    f.manager.destroy();
+  });
+});
+
+it.each(['160p', '360p', '480p', '720p', '1080p'])('matches %s to its available 30fps rendition', preference => {
+  expect(chooseQuality(preference, ['auto', 'chunked', `${preference}30`])).toBe(`${preference}30`);
 });
 
 it('chooses supported quality with an explicit automatic fallback', () => {
@@ -137,4 +208,7 @@ it('chooses supported quality with an explicit automatic fallback', () => {
   expect(chooseQuality('1080p60', ['auto', '480p'])).toBe('auto');
   expect(chooseQuality('720p60', ['chunked', '480p'])).toBe('chunked');
   expect(chooseQuality('auto', [])).toBeNull();
+  expect(chooseQuality('360p', ['360p30', '360p', 'auto'])).toBe('360p');
+  expect(chooseQuality('720p60', ['auto', '720p30'])).toBe('auto');
+  expect(chooseQuality('720p', ['auto', '720p60'])).toBe('auto');
 });
