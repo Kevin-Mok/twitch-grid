@@ -4,6 +4,9 @@ Use these checks against a static production build to verify actual viewing beha
 
 ## Real Twitch playback and lifecycle
 
+- Action: Select a quality unavailable on a loaded stream, toggle the sidebar, then choose a different unavailable quality. Also check a player error when one is available.
+  Expected: No quality fallback banner appears, including immediately after selection and through UI updates. Playback continues using an available quality; errors remain visible.
+
 - Action: Build with `npm run build`, serve with `npm run preview`, and open the printed URL in desktop Chrome/Chromium. Add one currently live channel and use Twitch’s built-in Play/Unmute controls if needed.
   Expected: The official player loads. Record visible moving video and audible output separately. Autoplay-blocked, content restriction, network and sign-in failures remain explicit limitations rather than claimed success.
 - Action: Add five distinct currently live channels. Record viewport, browser, hardware, quality preference and sampled actual qualities. In DevTools retain references to each `.video-host iframe` and observe frame navigation; reorder repeatedly, resize, toggle sidebar/chat, select different chats and change layout/focus.

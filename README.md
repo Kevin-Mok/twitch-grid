@@ -60,6 +60,8 @@ Preview prefers `http://127.0.0.1:4173` and also prints its selected port. `npm 
 
 The sidebar uses compact text and spacing, with channel actions beside names so more streams fit vertically.
 
+Unavailable quality preferences fall back silently to an available quality. Quality fallback banners are hidden; player errors remain visible.
+
 `Ctrl+B` (or `Cmd+B`) toggles the sidebar outside text fields. Escape exits focus mode. Sidebar **Settings** contains Layout, Chat, Maximize video, Fullscreen, Share and Backup & import. The floating menu button reopens a normally closed sidebar; maximized mode has Restore workspace. Individual players also have fullscreen controls. Removing a stream or clearing the lineup offers Undo; clearing and deleting profiles require confirmation.
 
 Use “Play all paused streams” to resume a saved/manual pause. Twitch’s event API does not identify whether an event came from a user or recovery; the app conservatively preserves paused intent even if a late PLAYING event arrives. Native Twitch pause is remembered, but resuming it should use the app control. A PAUSE event delivered just before OFFLINE may therefore also require an explicit resume. “Audio preference pending” means the SDK has not yet acknowledged a saved audio setting; stale startup values do not erase the preference.
