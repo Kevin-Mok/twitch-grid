@@ -122,14 +122,7 @@ small { display: block; font-size: 10px; line-height: 1.5; color: var(--muted); 
 .tile-heading-actions button { width: 25px; padding: 3px; min-height: 25px; font-size: 15px; }
 .video-host { min-width: 400px; min-height: 300px; flex: 1; background: #0b0e0c; }
 .video-host > iframe { width: 100%; height: 100%; display: block; border: 0; }
-.tile-footer { height: 36px; flex-shrink: 0; display: flex; align-items: center; padding: 0 5px; gap: 3px; min-width: 0; position: relative; background: #1b231e; }
-.tile-footer button { min-width: 24px; width: 25px; padding: 4px; font-size: 14px; }
-.tile-footer button.play-toggle { font-size: 12px; }
-.volume-slider { width: 58px; min-width: 32px; }
-.sound-on { color: var(--accent); }
-.quality-actual { font-size: 9px; color: #9dac9f; margin-left: auto; max-width: 75px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 3px; }
-.tile-footer select { font-size: 9px; padding: 3px 16px 3px 5px; max-width: 98px; background: #1b231e; border-color: #354437; }
-.tile-message { position: absolute; bottom: 40px; right: 8px; left: 8px; z-index: 1; font-size: 11px; line-height: 1.5; color: #efcf99; background: #25271df2; border: 1px solid #4a4931; border-radius: 4px; padding: 8px 10px; pointer-events: none; }
+.tile-message { position: absolute; top: 40px; right: 8px; left: 8px; z-index: 1; font-size: 11px; line-height: 1.5; color: #efcf99; background: #25271df2; border: 1px solid #4a4931; border-radius: 4px; padding: 8px 10px; pointer-events: none; }
 .player-tile:fullscreen { width: 100vw !important; height: 100dvh !important; transform: none !important; border-radius: 0; }
 .focus-exit { position: sticky; top: 0; left: 0; z-index: 3; margin-bottom: 8px; background: #284330; border-color: #48674d; color: #cee9d0; }
 .empty-workspace { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px; text-align: center; pointer-events: none; }

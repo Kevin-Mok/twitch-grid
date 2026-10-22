@@ -31,6 +31,5 @@ export interface PlayerSlot {
   element: HTMLElement;
   host: HTMLElement;
   header: HTMLElement;
-  footer: HTMLElement;
   snapshot: PlayerSnapshot;
 }

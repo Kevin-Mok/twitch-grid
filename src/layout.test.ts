@@ -7,10 +7,10 @@ function expectUsable(result: LayoutResult, count: number) {
     expect(tile.x).toBeGreaterThanOrEqual(0);
     expect(tile.y).toBeGreaterThanOrEqual(0);
     expect(tile.width).toBeGreaterThanOrEqual(400);
-    expect(tile.height - 72).toBeGreaterThanOrEqual(300);
+    expect(tile.height - 36).toBeGreaterThanOrEqual(300);
     expect(tile.x + tile.width).toBeLessThanOrEqual(result.width + 0.001);
     expect(tile.y + tile.height).toBeLessThanOrEqual(result.height + 0.001);
-    expect(tile.height - 72).toBeCloseTo(Math.max(300, tile.width * 9 / 16), 5);
+    expect(tile.height - 36).toBeCloseTo(Math.max(300, tile.width * 9 / 16), 5);
     for (const other of result.tiles.slice(index + 1)) {
       const separated = tile.x + tile.width <= other.x + 0.001
         || other.x + other.width <= tile.x + 0.001
@@ -33,7 +33,7 @@ describe('deterministic video layout', () => {
 
   it('centers a single 16:9 video within the available surface', () => {
     const result = calculateLayout(1, 1200, 800);
-    expect(result).toEqual({ width: 1200, height: 800, tiles: [{ x: 0, y: 26.5, width: 1200, height: 747 }] });
+    expect(result).toEqual({ width: 1200, height: 800, tiles: [{ x: 0, y: 44.5, width: 1200, height: 711 }] });
   });
 
   it('centers incomplete rows and honors requested column counts', () => {

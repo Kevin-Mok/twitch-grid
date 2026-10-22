@@ -81,7 +81,7 @@ test('blocked SDK loading surfaces an actionable per-player error', async ({ pag
   await page.route('https://player.twitch.tv/js/embed/v1.js', route => route.abort('failed'));
   await page.goto('/'); await add(page, 'alpha');
   await expect(page.getByRole('alert')).toContainText('Twitch could not load');
-  await expect(page.getByRole('button', { name: 'Reload alpha', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Reload hidden or visible alpha', exact: true })).toBeVisible();
 });
 
 for (const count of [1, 2, 3, 5, 8]) {

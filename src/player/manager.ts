@@ -52,9 +52,8 @@ export class PlayerManager {
     element.setAttribute('aria-label', `${channel.login} player`);
     const header = document.createElement('div'); header.className = 'tile-header';
     const host = document.createElement('div'); host.className = 'video-host';
-    const footer = document.createElement('div'); footer.className = 'tile-footer';
-    element.append(header, host, footer);
-    const entry: Entry = { channel: { ...channel }, element, host, header, footer, snapshot: initialSnapshot(), ready: false, disposed: false, appliedQuality: null, pendingMuted: channel.muted, pendingVolume: channel.volume };
+    element.append(header, host);
+    const entry: Entry = { channel: { ...channel }, element, host, header, snapshot: initialSnapshot(), ready: false, disposed: false, appliedQuality: null, pendingMuted: channel.muted, pendingVolume: channel.volume };
     this.entries.set(channel.login, entry);
     this.surface.append(element);
     this.factory(host, channel.login, event => this.event(entry, event)).then(handle => {

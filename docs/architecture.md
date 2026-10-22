@@ -19,7 +19,7 @@ This guide explains how domain state, permanent player hosts and browser integra
 
 ## Player lifetime invariant
 
-Each normalized channel has one registry entry containing an article, video host, header and footer. The manager appends it to one permanent surface exactly once. React renders its controls into the header/footer using portals. Reorder, resize, focus and panel changes update only tile transforms and dimensions. The surface stays at the same place in the React tree.
+Each normalized channel has one registry entry containing an article, video host and header. The manager appends it to one permanent surface exactly once. React renders its header controls and tile message overlays using portals. Reorder, resize, focus and panel changes update only tile transforms and dimensions. The surface stays at the same place in the React tree.
 
 Reconciliation is by normalized login. New channels create entries; removed channels dispose listeners/timers and their iframe. An overlapping profile keeps its retained entries. Explicit reload intentionally creates a new entry for one channel. Async SDK completion checks whether the entry was removed and cleans up instead of leaking a second player. The manager also has teardown for actual component unmounting.
 
@@ -29,9 +29,9 @@ Do not render players as a CSS grid of reordered React elements. Stable keys alo
 
 `Channel.intent` records the requested playing/paused state. Player events describe observed buffering, playing, paused, blocked and error states. User pause events update the saved intent. Global/per-stream commands change intent explicitly; unrelated UI changes issue no play command. OFFLINE/ONLINE do not force playback; paused intent is reapplied when a channel reports ONLINE.
 
-Event-cause limitation: Twitch does not label native user actions versus delayed/recovery events. A late PLAYING event cannot erase paused intent; the app pauses it again. Resume through the tile or global Play paused control. Native PAUSE before OFFLINE may conservatively retain pause after live return. This policy prioritizes explicit pause over guessing the cause of an upstream event.
+Event-cause limitation: Twitch does not label native user actions versus delayed/recovery events. A late PLAYING event cannot erase paused intent; the app pauses it again. Resume through the global Play paused control. Native PAUSE before OFFLINE may conservatively retain pause after live return. This policy prioritizes explicit pause over guessing the cause of an upstream event.
 
-The adapter starts muted, with SDK autoplay disabled, then applies saved intent when READY. Browsers may still block programmatic play or unmute; the tile exposes a user gesture. Available qualities come from each player, supporting both documented strings and observed SDK quality objects. Resolve a per-player override first, otherwise global preference; use `auto` if unsupported, otherwise the first available value. Display the requested fallback and sampled actual quality independently. Do not call quality setters before availability is known.
+The adapter starts muted, with SDK autoplay disabled, then applies saved intent when READY. Browsers may still block programmatic play or unmute; Twitch’s native controls and the app’s Play action offer a user gesture. Available qualities come from each player, supporting both documented strings and observed SDK quality objects. Resolve a per-player override first, otherwise global preference; use `auto` if unsupported, otherwise the first available value. Display fallback feedback over the video; inspect the actual quality in Twitch’s own settings. Do not call quality setters before availability is known.
 
 Audio setters cross an asynchronous frame boundary. Track pending mute/volume targets until sampled values acknowledge them; stale startup samples must not overwrite preferences. Once acknowledged, later native changes can update saved settings. A valid sample after a transient observation error clears the error to unknown, not online. Readiness/quality events may arrive before the factory promise resolves; only record an applied quality when a handle actually receives it.
 
@@ -47,7 +47,7 @@ Shares use a separate version-1 public payload (ordered login list, default qual
 
 ## Layout rules
 
-The inspected reference tests column counts and maximizes a centered 16:9 tile size, with a centered incomplete last row. This implementation uses an 8px gap and 72px control chrome. It honors Twitch’s minimum 400×300 video viewport; at narrow widths the native player may letterbox video. Auto layout chooses the largest fit, or the smallest vertical scroll canvas when none fits. Manual columns may require horizontal scrolling. Focus enlarges one tile and leaves other instances alive below it.
+The inspected reference tests column counts and maximizes a centered 16:9 tile size, with a centered incomplete last row. This implementation uses an 8px gap and 36px header chrome. It honors Twitch’s minimum 400×300 video viewport; at narrow widths the native player may letterbox video. Auto layout chooses the largest fit, or the smallest vertical scroll canvas when none fits. Manual columns may require horizontal scrolling. Focus enlarges one tile and leaves other instances alive below it.
 
 ## Adding a control, panel or provider
 

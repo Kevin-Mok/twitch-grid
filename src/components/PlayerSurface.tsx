@@ -46,7 +46,7 @@ export function PlayerSurface({ session, managerRef, patchChannel, openChat, rem
   useLayoutEffect(() => {
     for (const slot of slots) {
       const index = visible.findIndex(channel => channel.login === slot.channel.login);
-      const tile = index >= 0 ? layout.tiles[index] : { x: 0, y: -10000, width: 400, height: 372 };
+      const tile = index >= 0 ? layout.tiles[index] : { x: 0, y: -10000, width: 400, height: 336 };
       Object.assign(slot.element.style, { width: `${tile.width}px`, height: `${tile.height}px`, transform: `translate(${tile.x}px, ${tile.y}px)` });
       slot.element.classList.toggle('parked', index < 0);
       slot.element.classList.toggle('focused', slot.channel.login === focus);
@@ -64,19 +64,12 @@ export function PlayerSurface({ session, managerRef, patchChannel, openChat, rem
       const channel = session.channels.find(c => c.login === slot.channel.login);
       if (!channel) return null;
       const state = slot.snapshot;
-      const showPlay = channel.intent === 'paused' || state.playback === 'blocked' || state.playback === 'paused';
       const stale = state.live === 'offline' && Date.now() - state.lastSignal > 120000;
       const label = statusLabel(state);
       return [
         createPortal(<><span className={`live-indicator ${state.live}`} /><strong>{channel.login}</strong><span className={`status-label ${state.live}`}>{label}</span><div className="tile-heading-actions"><button aria-label={`Open chat for ${channel.login}`} title="Open chat" onClick={() => openChat(channel.login)}>▤</button><button aria-label={focus === channel.login ? `Unfocus ${channel.login}` : `Focus ${channel.login}`} title="Enlarge stream" onClick={() => setFocus(focus === channel.login ? null : channel.login)}>⤢</button><button aria-label={`Fullscreen ${channel.login}`} title="Fullscreen player" onClick={() => { void slot.element.requestFullscreen().catch(() => {}); }}>⛶</button><button aria-label={`Remove player ${channel.login}`} title="Remove stream" onClick={() => remove(channel.login)}>×</button></div></>, slot.header, `${channel.login}-header`),
-        createPortal(<><button className="play-toggle" aria-label={`${showPlay ? 'Play' : 'Pause'} ${channel.login}`} title={state.playback === 'blocked' ? 'Click to allow playback' : showPlay ? 'Play' : 'Pause'} onClick={() => { if (showPlay) managerRef.current?.start(channel.login); else patchChannel(channel.login, { intent: 'paused' }); }}>{showPlay ? '▶' : 'Ⅱ'}</button>
-          <button aria-label={`${channel.muted ? 'Unmute' : 'Mute'} ${channel.login}`} title={channel.muted ? 'Unmute' : 'Mute'} className={channel.muted ? '' : 'sound-on'} onClick={() => patchChannel(channel.login, { muted: !channel.muted })}>{channel.muted ? '◌' : '◖'}</button>
-          <input className="volume-slider" aria-label={`Volume for ${channel.login}`} type="range" min="0" max="1" step="0.01" value={channel.volume} onChange={e => patchChannel(channel.login, { volume: Number(e.target.value) })} />
-          <span className="quality-actual" title={`Actual quality: ${state.quality}. ${state.fallback ?? ''}`}>{state.playback === 'blocked' ? 'Click play' : state.playback === 'buffering' ? 'Buffering' : state.quality === 'unknown' ? 'Connecting' : state.quality === 'chunked' ? 'Source' : state.quality}</span>
-          <select aria-label={`Quality for ${channel.login}`} title={state.fallback ?? 'Quality preference'} value={channel.quality ?? ''} onChange={e => patchChannel(channel.login, { quality: e.target.value || null })}><option value="">Use default</option>{[...new Set([...state.qualities, ...(channel.quality ? [channel.quality] : [])])].map(q => <option key={q} value={q}>{q === 'chunked' ? 'Source' : q}</option>)}</select>
-          <button aria-label={`Refresh status for ${channel.login}`} title="Refresh available player status (does not reload)" onClick={() => managerRef.current?.refresh(channel.login)}>⌁</button><button aria-label={`Reload ${channel.login}`} title="Reload this player" onClick={() => managerRef.current?.reload(channel.login)}>↻</button>
-          {(state.error || state.fallback || stale || state.audioPending) && <span className="tile-message" role={state.error ? 'alert' : undefined}>{state.error ?? state.fallback ?? (state.audioPending ? 'Audio preference pending. Use the audio controls to retry if it stays pending.' : 'Status is stale. Reload this channel to check again.')}</span>}
-        </>, slot.footer, `${channel.login}-footer`),
+        createPortal(<>{(state.error || state.fallback || stale || state.audioPending) && <span className="tile-message" role={state.error ? 'alert' : undefined}>{state.error ?? state.fallback ?? (state.audioPending ? 'Audio preference pending. Use Twitch’s audio controls to retry if it stays pending.' : 'Status is stale. Reload this channel to check again.')}</span>}
+        </>, slot.element, `${channel.login}-message`),
       ];
     })}
   </div>;

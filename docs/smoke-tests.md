@@ -4,14 +4,14 @@ Use these checks against a static production build to verify actual viewing beha
 
 ## Real Twitch playback and lifecycle
 
-- Action: Build with `npm run build`, serve with `npm run preview`, and open the printed URL in desktop Chrome/Chromium. Add one currently live channel and use the tile’s Play/Unmute controls if needed.
+- Action: Build with `npm run build`, serve with `npm run preview`, and open the printed URL in desktop Chrome/Chromium. Add one currently live channel and use Twitch’s built-in Play/Unmute controls if needed.
   Expected: The official player loads. Record visible moving video and audible output separately. Autoplay-blocked, content restriction, network and sign-in failures remain explicit limitations rather than claimed success.
 - Action: Add five distinct currently live channels. Record viewport, browser, hardware, quality preference and sampled actual qualities. In DevTools retain references to each `.video-host iframe` and observe frame navigation; reorder repeatedly, resize, toggle sidebar/chat, select different chats and change layout/focus.
   Expected: Retained video iframes stay connected under the same parent; no app-created replacement or reload occurs. Smoothness and upstream navigation are observations, not guarantees. Avoid screenshots of private chat/account state.
 - Action: Pause one stream manually. Change layout and chat. In a controlled fixture, emit OFFLINE then ONLINE for that channel; in a real channel wait for an actual transition if feasible.
   Expected: Paused intent remains paused. “Play paused” resumes it only on request. A simulated transition proves application handling, not Twitch’s real event delivery.
-- Action: Unmute one tile and change only its volume/quality. Set a global preference unavailable for one stream, with that stream on “Use default”.
-  Expected: Other streams retain sound choices. Preference and actual quality are distinct; unavailable choices show a fallback. No chat or focus action unmutes another stream.
+- Action: Use Twitch’s built-in controls to unmute one video and adjust its volume/quality. Change layout and chat, then reload the page.
+  Expected: Other streams retain sound choices and the changed audio settings persist. No extra controls or empty footer space appear below any video; native controls remain reachable. No chat or focus action unmutes another stream.
 - Action: Switch to another browser tab for at least a minute, then return. Repeat with a background window if useful.
   Expected: The app performs no visibility-triggered reload or force-play. Record any browser/Twitch suspension; actual audio continuity needs human observation.
 

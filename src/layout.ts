@@ -6,7 +6,7 @@ export interface LayoutResult { width: number; height: number; tiles: TileRect[]
 const GAP = 8;
 const MIN_WIDTH = 400;
 const MIN_VIDEO_HEIGHT = 300;
-const CHROME_HEIGHT = 72;
+const CHROME_HEIGHT = 36;
 
 function tileHeight(width: number): number {
   return Math.max(MIN_VIDEO_HEIGHT, width * 9 / 16) + CHROME_HEIGHT;

@@ -7,6 +7,22 @@ async function add(page: import('@playwright/test').Page, value: string) {
   await page.getByRole('button', { name: 'Add channels', exact: true }).click();
 }
 
+test('player videos fill header-only tiles without duplicate controls', async ({ page }) => {
+  await add(page, 'alpha bravo');
+  await expect(page.locator('.video-host iframe')).toHaveCount(2);
+  for (const width of [390, 768, 1280, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect(page.locator('.tile-footer, .volume-slider')).toHaveCount(0);
+    await expect.poll(() => page.locator('.player-tile').evaluateAll(tiles => tiles.every(tile => {
+      const video = tile.querySelector('.video-host')!.getBoundingClientRect();
+      const header = tile.querySelector('.tile-header')!.getBoundingClientRect();
+      const bounds = tile.getBoundingClientRect();
+      return video.height >= 300 && Math.abs(video.top - header.bottom) < 1 && Math.abs(video.bottom - bounds.bottom) <= 1;
+    }))).toBe(true);
+    await page.screenshot({ path: `/tmp/player-no-footer-${width}.png` });
+  }
+});
+
 test('five players retain iframe identity and navigation across all visual changes', async ({ page }) => {
   const navigations: string[] = [];
   page.on('framenavigated', frame => { if (frame.url().startsWith('https://player.twitch.tv/?')) navigations.push(frame.url()); });
@@ -30,15 +46,21 @@ test('five players retain iframe identity and navigation across all visual chang
 test('manual pause survives offline recovery; sound and quality stay independent', async ({ page }) => {
   await add(page, 'alpha bravo');
   await expect(page.locator('[data-channel="alpha"]')).toContainText('Live');
-  await page.getByRole('button', { name: 'Pause alpha', exact: true }).click();
-  await page.evaluate(() => { const p = (window as unknown as { __players: Record<string, { emit(e: string): void }> }).__players.alpha; p.emit('offline'); p.emit('online'); });
-  await expect(page.getByRole('button', { name: 'Play alpha', exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Unmute alpha', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Unmute bravo', exact: true })).toBeVisible();
-  await page.getByLabel('Quality for alpha').selectOption('720p60');
+  await page.evaluate(() => {
+    const player = (window as unknown as { __players: Record<string, { pause(): void; emit(event: string): void }> }).__players.alpha;
+    player.pause(); player.emit('offline'); player.emit('online');
+  });
+  await expect(page.locator('.channel-name').filter({ hasText: /^alpha/ })).toContainText('Paused');
+  await page.evaluate(() => (window as unknown as { __players: Record<string, { setMuted(value: boolean): void }> }).__players.alpha.setMuted(false));
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('twitch-multiplayer:v2')!).session.channels[0].muted)).toBe(false);
+  await expect(page.locator('.channel-name').filter({ hasText: /^bravo/ })).toContainText('Muted');
+  await page.getByLabel('Global quality preference').selectOption('720p60');
   await page.getByRole('button', { name: 'Play paused', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Pause alpha', exact: true })).toBeVisible();
-  expect(await page.evaluate(() => (window as unknown as { __players: Record<string, { muted: boolean; quality: string }> }).__players.bravo.muted)).toBe(true);
+  await expect(page.locator('.channel-name').filter({ hasText: /^alpha/ })).toContainText('Sound on');
+  await expect.poll(() => page.evaluate(() => {
+    const players = (window as unknown as { __players: Record<string, { paused: boolean; muted: boolean; quality: string }> }).__players;
+    return { alphaPaused: players.alpha.paused, bravoMuted: players.bravo.muted, alphaQuality: players.alpha.quality };
+  })).toEqual({ alphaPaused: false, bravoMuted: true, alphaQuality: '720p60' });
 });
 
 test('overlapping profiles preserve retained frames and restore ordered browser data', async ({ page }) => {
