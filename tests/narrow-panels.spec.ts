@@ -29,7 +29,18 @@ test('compact panels keep two video columns with chat open', async ({ page }, te
   for (let i = 0; i < 25; i++) await page.keyboard.press('ArrowLeft');
   await expect(divider).toHaveAttribute('aria-valuenow', '640');
   expect((await page.locator('.chat-panel').boundingBox())!.width).toBeLessThanOrEqual(248);
-  expect(await page.locator('.player-viewport').evaluate(node => node.scrollWidth <= node.clientWidth)).toBe(true);
+  for (const [width, height] of [[1280, 900], [1440, 730], [2048, 973]]) {
+    await page.setViewportSize({ width, height });
+    await expect.poll(async () => page.locator('.player-tile').evaluateAll(tiles => {
+      const [a, b, c, d] = tiles.map(tile => tile.getBoundingClientRect());
+      return a.y === b.y && c.y === d.y && c.y > a.y
+        && a.x === c.x && b.x === d.x && b.x > a.x;
+    })).toBe(true);
+    expect(await page.locator('.player-viewport').evaluate(node =>
+      node.scrollWidth <= node.clientWidth && node.scrollHeight <= node.clientHeight,
+    )).toBe(true);
+    await page.screenshot({ path: testInfo.outputPath(`wide-chat-${width}.png`) });
+  }
   await page.setViewportSize({ width: 390, height: 900 });
   await expect(page.getByRole('button', { name: 'Play all paused streams', exact: true })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('panels-mobile.png') });

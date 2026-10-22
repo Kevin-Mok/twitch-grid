@@ -35,7 +35,7 @@ export function PlayerSurface({ session, managerRef, patchChannel, openChat, rem
     const element = viewport.current!;
     const observer = new ResizeObserver(entries => {
       const { width, height } = entries[0].contentRect;
-      setSize({ width: Math.max(1, width - 16), height: Math.max(1, height - 16) });
+      setSize({ width: Math.max(1, width), height: Math.max(1, height) });
     });
     observer.observe(element); return () => observer.disconnect();
   }, []);
