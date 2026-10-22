@@ -191,7 +191,7 @@ kbd { font-family: inherit; border: 1px solid #3e4b41; padding: 1px 4px; border-
 }
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior: auto !important; } }
 
-.fps-indicator, .bitrate-indicator { flex-shrink: 0; color: var(--muted); font-size: 10px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.quality-indicator, .fps-indicator, .bitrate-indicator { flex-shrink: 0; color: var(--muted); font-size: 10px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 .bitrate-summary { margin-bottom: 8px; font-size: 10px; color: var(--muted); }
 .bitrate-summary > span { display: flex; justify-content: space-between; gap: 6px; }

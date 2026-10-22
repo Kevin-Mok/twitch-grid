@@ -66,3 +66,29 @@ test('per-stream bitrate sums all reporting streams and marks unavailable/partia
   await expect(compactTotal).toHaveText('↓ — MB/s');
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('twitch-multiplayer:v2')!).session.channels[0])).not.toHaveProperty('bitrateKbps');
 });
+
+test('current stream quality appears immediately before FPS and follows player samples', async ({ page }) => {
+  await fakeTwitch(page);
+  await page.goto('/');
+  await page.getByLabel('Channel or Twitch URL').fill('Alpha');
+  await page.getByRole('button', { name: 'Add channels', exact: true }).click();
+  const quality = page.locator('[data-channel="alpha"] .quality-indicator');
+  await expect(quality).toHaveText('Auto');
+  for (const [reported, label] of [['720p60', '720p'], ['480p30', '480p'], ['chunked', 'Source'], ['audio_only', 'Audio only'], ['unknown', 'Quality —'], ['', 'Quality —']]) {
+    await page.evaluate(value => {
+      (window as unknown as { __players: Record<string, { quality: string }> }).__players.alpha.quality = value;
+    }, reported);
+    await expect(quality).toHaveText(label);
+    if (reported === '480p30') {
+      await expect(page.locator('[data-channel="alpha"] .fps-indicator')).toHaveText('30 FPS');
+      await expect(page.locator('[data-channel="alpha"] .fps-indicator')).toHaveAttribute('title', /advertised/i);
+      await page.evaluate(() => {
+        (window as unknown as { __players: Record<string, { getPlaybackStats?: () => unknown }> }).__players.alpha.getPlaybackStats = () => ({ fps: 25 });
+      });
+      await expect(page.locator('[data-channel="alpha"] .fps-indicator')).toHaveText('25 FPS');
+      await expect(page.locator('[data-channel="alpha"] .fps-indicator')).toHaveAttribute('title', /Estimated Twitch playback FPS/);
+    }
+  }
+  await expect(page.locator('[data-channel="alpha"] .quality-indicator + .fps-indicator')).toHaveCount(1);
+  await expect(quality).toHaveAccessibleName('alpha: current playback quality unavailable');
+});
