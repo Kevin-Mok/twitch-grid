@@ -91,7 +91,9 @@ The one supported legacy schema for this app is `twitch-multiplayer:v1` containi
 
 ## Static Vercel hosting
 
-No deployment is performed by this build task. When you choose to deploy, import the project into Vercel with:
+Production is live at [twitchgrid.vercel.app](https://twitchgrid.vercel.app). The Vercel project **twitchgrid** in **kevin-mok** is connected to `Kevin-Mok/twitch-grid`; pushes to **main** automatically deploy to production through Vercel’s GitHub integration. Deployment settings are saved in Vercel, so no GitHub Actions workflow, repository secret or local upload is required. Other branch pushes use Vercel previews.
+
+The configured static build settings are:
 
 | Setting | Value |
 | --- | --- |

@@ -87,3 +87,11 @@ Use these checks against a static production build to verify actual viewing beha
 
 - Action: Add `Risezd` or `https://twitch.tv/Risezd`, then re-enter the same channel as `RiSeZd`. Open its chat, reload, and round-trip a JSON backup or saved profile. Also load an older backup with no display name.
   Expected: Tile, sidebar and chat selection preserve entered spelling. Re-entry updates casing without duplicating or replacing the player; login identity remains `risezd`. Reload/profile/backup retain it. Older names fall back to lowercase; share links retain lowercase logins. Online tiles show the status dot without Live text, numeric estimates such as `25 FPS`. Offline/error/unknown labels stay visible; FPS tooltips still explain the provider estimate.
+
+
+## Automatic Vercel deployment
+
+- Action: Open https://twitchgrid.vercel.app after a normal committed push to main. Check the twitchgrid project in Vercel for the new commit.
+  Expected: Vercel automatically creates a production deployment from Kevin-Mok/twitch-grid main. A Ready deployment uses that commit SHA and updates twitchgrid.vercel.app; existing local-only dirty files are not deployed.
+- Action: Open the public site without Vercel login; load the empty workspace and add a public live Twitch channel.
+  Expected: HTML and built assets load publicly. Twitch receives twitchgrid.vercel.app as the embed parent. Saved lineups belong to this browser and origin; local-development storage is not migrated. Moving video/audio still require a separate human playback check.
