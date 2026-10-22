@@ -4,7 +4,7 @@ A static Twitch multistream workspace for viewers who keep several channels open
 
 This independent rebuild studies [Viewington](https://viewington.com/) without shipping its bundles or using its private services. The compact dark interface prioritizes video. Full parity is not claimed: Windows behavior was inspected statically, and Twitch controls autoplay, live availability and embedded login.
 
-Validation: 128 unit/integration and 18 static-browser tests pass. Real player and chat embeds load, but sustained moving video and audio remain unverified in the isolated test browser; the bare official player also stalled. See [validation evidence and remaining checks](docs/validation.md) before treating this as a verified watching setup.
+Validation: 130 unit/integration and 19 static-browser tests pass for the isolated compact-chat candidate, including chat help and maximizing the video canvas. Real player and chat embeds load, but sustained moving video and audio remain unverified in the isolated test browser; the bare official player also stalled. See [validation evidence and remaining checks](docs/validation.md) and the [compact chat checks](plans/compact-chat-video.md) before treating this as a verified watching setup.
 
 **Known issue:** a desktop user reported that `mrsavage` keeps playing while starting `coachboop` plays briefly and stops. Simultaneous real playback is unresolved; fixture test success does not establish that this core workflow works. See the [open playback investigation](docs/postmortem/2026-10-22-simultaneous-playback.md).
 
@@ -54,8 +54,9 @@ Preview prefers `http://127.0.0.1:4173` and also prints its selected port. `npm 
 2. Use the sidebar arrows to reorder. Auto grid fits tiles without cropping. If minimum video sizes cannot fit, the canvas scrolls. Choose 1–4 columns or enlarge a tile with its focus control.
 3. Each footer has play/pause, mute, volume, quality preference, status sample and explicit reload. The actual quality appears separately. “Use default” follows the global preference; a per-stream choice overrides it. An unavailable preference falls back to `auto`, then the first supported quality, with a visible explanation.
 4. “Play paused” also offers a gesture to start blocked playback. “Pause all” and “Mute all” act independently. Selecting or opening chat never unmutes a stream.
-5. Open a stream’s chat and use the dropdown in its header to switch channels. Use the header arrow to collapse chat, or drag its divider to resize. The divider also responds to left/right arrows. Chat login depends on Twitch and browser cookie policy; use “Open chat on Twitch” if the embed cannot sign in.
-6. Save named profiles. Load preserves overlapping player instances. “Update selected profile” explicitly saves edits to its lineup/settings; rename and delete are separate controls.
+5. Open a stream’s chat and use the dropdown in its header to switch channels. Login help automatically closes when the chat frame loads; loading does not prove login or messaging works. **Chat help** reopens or minimizes the cookie guidance and “Open chat on Twitch” fallback. Drag the divider or use its left/right arrows to resize; the arrow in the chat header closes the panel.
+6. Use **Maximize video** to hide the app bars and sidebar while keeping chat and stream controls available. **Restore workspace** or Escape brings them back without reloading embeds or changing saved sidebar preferences. Video keeps its aspect ratio and minimum size, so large lineups may still scroll. Escape inside Twitch’s own iframe belongs to Twitch; use Restore workspace in that case.
+7. Save named profiles. Load preserves overlapping player instances. “Update selected profile” explicitly saves edits to its lineup/settings; rename and delete are separate controls.
 
 `Ctrl+B` (or `Cmd+B`) toggles the sidebar outside text fields. Escape exits focus mode. The workspace and individual players have fullscreen controls. Removing a stream or clearing the lineup offers Undo; clearing and deleting profiles require confirmation.
 

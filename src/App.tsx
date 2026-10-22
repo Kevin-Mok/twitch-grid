@@ -22,6 +22,7 @@ export function App() {
   const [error, setError] = useState<string | null>(null);
   const [transfer, setTransfer] = useState<'share' | 'backup' | null>(null);
   const [focus, setFocus] = useState<string | null>(null);
+  const [videoMaximized, setVideoMaximized] = useState(false);
   const [undo, setUndo] = useState<WatchSession | null>(null);
   const manager = useRef<PlayerManager | null>(null);
   const session = data.session;
@@ -57,10 +58,10 @@ export function App() {
   }, [updateSession]);
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { setFocus(null); setVideoMaximized(false); }
       const target = event.target as HTMLElement | null;
       if (target?.closest('input, textarea, select, [contenteditable="true"], dialog')) return;
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'b') { event.preventDefault(); run('toggle-sidebar'); }
-      if (event.key === 'Escape') setFocus(null);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -100,7 +101,8 @@ export function App() {
   };
   const active = data.profiles.find(p => p.id === data.activeProfileId);
 
-  return <div className="app-shell">
+  return <div className={`app-shell${videoMaximized ? ' video-maximized' : ''}`}>
+    {videoMaximized && <button className="restore-workspace" aria-label="Restore workspace" title="Restore workspace · Escape" onClick={() => setVideoMaximized(false)}>↙ Restore workspace</button>}
     <header className="app-header">
       <button className="icon-button sidebar-toggle" aria-label="Toggle sidebar (Ctrl+B)" title="Toggle sidebar · Ctrl+B" onClick={() => run('toggle-sidebar')}><span aria-hidden="true">☰</span></button>
       <div className="brand"><span className="brand-mark" aria-hidden="true"><i /><i /><i /><i /></span><span>Twitch <strong>Multiplayer</strong></span><span className="beta-label">LOCAL</span></div>
@@ -116,7 +118,7 @@ export function App() {
         <div className="watch-toolbar">
           <div className="toolbar-group"><button aria-label="Play paused" title="Start paused or blocked players" onClick={() => run('play-paused')}>▶ <span>Play paused</span></button><button aria-label="Pause all" onClick={() => run('pause-all')}>Ⅱ <span>Pause all</span></button><button aria-label="Mute all" onClick={() => run('mute-all')}>◌ <span>Mute all</span></button><button aria-label="Reload all" title="Recreate every player" onClick={() => run('reload-all')}>↻ <span>Reload all</span></button></div>
           <div className="toolbar-group layout-tools"><label className="select-label"><span>Layout</span><select aria-label="Layout" value={session.layout} onChange={e => updateSession(s => ({ ...s, layout: (e.target.value === 'auto' ? 'auto' : Number(e.target.value)) as LayoutMode }))}><option value="auto">Auto grid</option><option value="1">1 column</option><option value="2">2 columns</option><option value="3">3 columns</option><option value="4">4 columns</option></select></label>
-            <button className={session.chat.open ? 'is-active' : ''} aria-label="Toggle chat" aria-pressed={session.chat.open} onClick={() => run('toggle-chat')}>▤ <span>Chat</span></button><button aria-label="Fullscreen workspace" title="Fullscreen workspace" onClick={() => run('fullscreen')}>⛶</button></div>
+            <button className={session.chat.open ? 'is-active' : ''} aria-label="Toggle chat" aria-pressed={session.chat.open} onClick={() => run('toggle-chat')}>▤ <span>Chat</span></button><button aria-label="Maximize video" title="Hide app bars to maximize video space" onClick={() => setVideoMaximized(true)}>↗ <span>Maximize video</span></button><button aria-label="Fullscreen workspace" title="Fullscreen workspace" onClick={() => run('fullscreen')}>⛶</button></div>
         </div>
         {error && <div className="message error" role="alert"><span>{error}</span><button aria-label="Dismiss error" onClick={() => setError(null)}>×</button></div>}
         {notice && <div className="message notice" role="status"><span>{notice}</span>{undo && <button onClick={() => { updateSession(() => undo); setUndo(null); setNotice('Previous stream list restored.'); }}>Undo</button>}<button aria-label="Dismiss notice" onClick={() => { setNotice(null); setUndo(null); }}>×</button></div>}

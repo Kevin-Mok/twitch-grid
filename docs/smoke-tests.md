@@ -28,7 +28,9 @@ Use these checks against a static production build to verify actual viewing beha
 - Action: Open chat for A, switch to B using the header dropdown with mouse and keyboard, drag the divider, use its left/right arrow keys, collapse/reopen, then remove the selected channel.
   Expected: One dropdown stays in the header before and after frame load, with no extra selector row. One chat embed follows the selected channel; width persists. Video hosts and audio remain unchanged. Removed channels resolve to another present channel or the empty state.
 - Action: Try Twitch chat login in your usual privacy configuration.
-  Expected: Normal Twitch interaction works where the browser allows it. The external “Open chat on Twitch” fallback remains available; the app does not read messages or access the chat DOM.
+  Expected: The compact header dropdown stays available; login help closes on frame load. Chat help reopens/minimizes the cookie guidance and external “Open chat on Twitch” fallback without reloading chat. Switching channels closes help when the new frame loads. Frame load is not proof of login or messaging success: test normal Twitch interaction separately where the browser allows it. The app does not read messages or access the chat DOM.
+- Action: At widths 390, 768, 1280 and 1440, open two streams and chat, then choose Maximize video. Restore with Restore workspace and repeat using Escape while an app control has focus.
+  Expected: The app header, toolbar, sidebar and bottom status bar disappear; the video canvas gains their vertical space. Chat and player controls stay available, and the restore button remains reachable. Restoring returns the original sidebar preference. Existing video and chat frames stay connected with unchanged audio. Escape inside Twitch’s own iframe may be handled by Twitch; Restore workspace still works. Minimum player size, aspect ratio and scrolling remain unchanged.
 
 ## Data and recovery
 

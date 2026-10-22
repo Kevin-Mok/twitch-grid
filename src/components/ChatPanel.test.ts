@@ -35,13 +35,17 @@ it('keeps one channel dropdown in the header after load and switches chats direc
   const frame = container.querySelector('iframe')!;
   act(() => frame.dispatchEvent(new Event('load')));
   expect(container.querySelector('.chat-header select')).toBe(select);
+  expect(container.querySelector('.chat-note')).toBeNull();
   act(() => { select.value = 'bravo'; select.dispatchEvent(new Event('change', { bubbles: true })); });
   expect(update).toHaveBeenCalledWith({ ...session.chat, open: true, channel: 'bravo' });
+  act(() => button('Chat help').click());
+  expect(container.querySelector('.chat-note a')?.getAttribute('href')).toContain('/popout/alpha/chat');
   expect(container.querySelector('iframe')).toBe(frame);
   render('bravo');
   expect(container.querySelector('iframe')).toBe(frame);
   expect(frame.getAttribute('src')).toContain('/bravo/chat');
   act(() => frame.dispatchEvent(new Event('load')));
+  expect(container.querySelector('.chat-note')).toBeNull();
 });
 
 it('offers header channel selection without an embed and preserves collapse', () => {

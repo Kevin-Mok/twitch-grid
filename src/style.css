@@ -166,6 +166,8 @@ kbd { font-family: inherit; border: 1px solid #3e4b41; padding: 1px 4px; border-
 .chat-empty p { font-size: 12px; color: #95a99b; }
 .chat-resizer { position: absolute; top: 0; bottom: 0; left: -4px; width: 7px; cursor: col-resize; z-index: 5; touch-action: none; }
 .chat-resizer:hover,.chat-resizer:focus-visible { background: #55d6a055; }
+.video-maximized .app-header,.video-maximized .watch-toolbar,.video-maximized .workspace-footer,.video-maximized .sidebar { display: none; }
+.restore-workspace { position: fixed; bottom: 8px; left: 8px; z-index: 8; border-color: #46554c; background: #1b231ef2; box-shadow: 0 2px 8px #0006; }
 .message { min-height: 33px; padding: 4px 12px; display: flex; align-items: center; gap: 8px; font-size: 11px; border-bottom: 1px solid #2e4033; flex-shrink: 0; }
 .message > span { flex: 1; }
 .message button { padding: 2px 6px; min-height: 24px; }

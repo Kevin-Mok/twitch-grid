@@ -1,10 +1,12 @@
-import { useRef } from 'react';
+import { useId, useRef, useState } from 'react';
 import type { Channel, WatchSession } from '../domain';
 import { embedParents, twitchChat } from '../chat';
 
 interface Props { settings: WatchSession['chat']; channels: Channel[]; update(settings: WatchSession['chat']): void }
 export function ChatPanel({ settings, channels, update }: Props) {
   const drag = useRef<{ x: number; width: number } | null>(null);
+  const [helpOpen, setHelpOpen] = useState(true);
+  const helpId = useId();
   if (!settings.open) return null;
   const selected = channels.find(c => c.login === settings.channel)?.login ?? null;
   const resize = (width: number) => update({ ...settings, width: Math.min(640, Math.max(240, Math.round(width))) });
@@ -19,9 +21,10 @@ export function ChatPanel({ settings, channels, update }: Props) {
       onPointerUp={() => { drag.current = null; }} onPointerCancel={() => { drag.current = null; }} />
     <div className="chat-header">
       <label className="chat-channel-select"><span className="chat-hash" aria-hidden="true">#</span><select aria-label="Chat channel" value={selected ?? ''} onChange={event => update({ ...settings, channel: event.target.value || null })}><option value="" disabled>Choose a channel</option>{channels.map(c => <option key={c.login} value={c.login}>{c.login}</option>)}</select></label>
+      <button aria-label="Chat help" aria-expanded={helpOpen} aria-controls={helpId} title="Login help and open on Twitch" onClick={() => setHelpOpen(!helpOpen)}>?</button>
       <button aria-label="Collapse chat" title="Collapse chat" onClick={() => update({ ...settings, open: false })}>→</button>
     </div>
-    {configError ? <p role="alert">{configError}</p> : selected ? <iframe className="chat-frame" title={`Twitch chat for ${selected}`} src={url} /> : <div className="chat-empty"><h3>A place for the conversation.</h3><p>Add a stream, then choose its chat.</p></div>}
-    <div className="chat-note"><p>Login or chat unavailable? Your browser may restrict embedded cookies.</p>{selected && <a href={twitchChat.externalUrl(selected)} target="_blank" rel="noopener noreferrer">Open chat on Twitch ↗</a>}</div>
+    {configError ? <p role="alert">{configError}</p> : selected ? <iframe className="chat-frame" title={`Twitch chat for ${selected}`} src={url} onLoad={() => { setHelpOpen(false); }} /> : <div className="chat-empty"><h3>A place for the conversation.</h3><p>Add a stream, then choose its chat.</p></div>}
+    {helpOpen && <div className="chat-note" id={helpId}><p>Login or chat unavailable? Your browser may restrict embedded cookies.</p>{selected && <a href={twitchChat.externalUrl(selected)} target="_blank" rel="noopener noreferrer">Open chat on Twitch ↗</a>}</div>}
   </aside>;
 }

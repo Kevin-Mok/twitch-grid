@@ -18,7 +18,7 @@ test('five players retain iframe identity and navigation across all visual chang
   await page.setViewportSize({ width: 1200, height: 760 });
   await page.getByRole('button', { name: 'Toggle sidebar (Ctrl+B)', exact: true }).click();
   await page.getByRole('button', { name: 'Open chat for alpha', exact: true }).click();
-  await page.getByLabel('Chat channel').selectOption('bravo');
+  await page.getByRole('combobox', { name: 'Chat channel', exact: true }).selectOption('bravo');
   await page.getByRole('button', { name: 'Toggle chat', exact: true }).click();
   await page.getByLabel('Layout').selectOption('2');
   await page.getByRole('button', { name: 'Focus alpha', exact: true }).click();
