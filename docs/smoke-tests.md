@@ -17,6 +17,8 @@ Use these checks against a static production build to verify actual viewing beha
 
 ## Layout, keyboard and chat
 
+- Action: Open the app in a fresh browser tab, then open `/favicon.svg` on the same origin.
+  Expected: The tab icon and SVG match the header's purple-and-white 2×2 logo.
 - Action: Check 1, 2, 3, 5 and 8 players at 1440×900 and 1280×800. Also inspect controls at widths 390 and 768. Try 1–4 columns and focus one stream.
   Expected: Video viewports remain at least 400×300; the canvas scrolls when needed. Rows are centered and do not overlap; ordinary app controls remain reachable. Desktop is the primary target.
 - Action: Press Ctrl+B while editing the channel input, then focus a toolbar button and press it again.
