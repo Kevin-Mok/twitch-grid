@@ -10,7 +10,7 @@ export function chooseQuality(preference: string, qualities: string[]): string |
 }
 
 type Entry = PlayerSlot & { handle?: PlayerHandle; ready: boolean; disposed: boolean; requestedQuality: string | null; qualityAttempts: number | null; pendingMuted: boolean | null; pendingVolume: number | null };
-const initialSnapshot = (): PlayerSnapshot => ({ live: 'unknown', playback: 'loading', quality: 'unknown', qualities: [], fallback: null, error: null, lastSignal: Date.now(), audioPending: false });
+const initialSnapshot = (): PlayerSnapshot => ({ live: 'unknown', playback: 'loading', quality: 'unknown', qualities: [], fallback: null, error: null, lastSignal: Date.now(), audioPending: false, fps: null });
 
 export class PlayerManager {
   private entries = new Map<string, Entry>();
@@ -112,7 +112,7 @@ export class PlayerManager {
     const state = entry.snapshot;
     const reconnecting = event.type === 'online' && state.live === 'offline';
     state.live = twitchStatusProvider.observe(state.live, event.type);
-    if (event.type !== 'sample') state.lastSignal = Date.now();
+    if (event.type !== 'sample') { state.lastSignal = Date.now(); state.fps = null; }
     switch (event.type) {
       case 'ready':
         if (!entry.ready) { entry.ready = true; if (entry.handle) this.initialize(entry); }
@@ -148,6 +148,7 @@ export class PlayerManager {
         }
         state.quality = event.quality || 'unknown';
         state.qualities = [...event.qualities];
+        state.fps = state.live === 'online' && state.playback === 'playing' && typeof event.fps === 'number' && Number.isFinite(event.fps) && event.fps > 0 ? event.fps : null;
         const patch: Partial<Channel> = {};
         if (entry.pendingMuted !== null) {
           if (event.muted === entry.pendingMuted) entry.pendingMuted = null;

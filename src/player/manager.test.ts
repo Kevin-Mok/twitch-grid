@@ -31,6 +31,31 @@ function fixture() {
 }
 
 describe('persistent player manager', () => {
+  it('exposes FPS only for confirmed active playback and clears lifecycle transitions', async () => {
+    const f = fixture(); f.manager.sync([channel('alpha')], 'auto'); await tick();
+    const emit = f.emitters.get('alpha')!;
+    const sample = (fps: unknown, paused = false) => emit({ type: 'sample', fps, paused, quality: 'auto', qualities: ['auto'], muted: true, volume: 0.5 } as PlayerEvent);
+    emit({ type: 'ready' }); sample(30);
+    expect(f.manager.slots()[0].snapshot).toMatchObject({ fps: null });
+    for (const type of ['pause', 'offline', 'play', 'blocked', 'error'] as const) {
+      f.manager.start('alpha');
+      emit({ type: 'online' }); emit({ type: 'play' }); emit({ type: 'playing' }); sample(30);
+      expect(f.manager.slots()[0].snapshot).toMatchObject({ fps: 30 });
+      emit(type === 'error' ? { type, message: 'test' } : { type });
+      expect(f.manager.slots()[0].snapshot).toMatchObject({ fps: null });
+    }
+    f.manager.start('alpha');
+    emit({ type: 'online' }); emit({ type: 'play' }); emit({ type: 'playing' });
+    for (const fps of [null, 0, -1, NaN, Infinity, '60', undefined]) {
+      sample(fps);
+      expect(f.manager.slots()[0].snapshot).toMatchObject({ fps: null });
+    }
+    sample(60, true);
+    expect(f.manager.slots()[0].snapshot).toMatchObject({ fps: null });
+    expect(f.manager.slots()[0].channel.quality).toBe(null);
+    f.manager.destroy();
+  });
+
   it('reports observed startup pause without erasing the requested playback intent', async () => {
     const f = fixture(); f.manager.sync([channel('alpha')], 'auto'); await tick();
     f.emitters.get('alpha')!({ type: 'ready' });

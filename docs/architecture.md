@@ -58,3 +58,8 @@ The inspected reference tests column counts and maximizes a centered 16:9 tile s
 5. Add a behavior test, then browser assertions for iframe identity and navigation. Run static serving and real-provider smoke checks before claiming integration works.
 
 Rollback is local: export data before schema work, keep old storage keys until migration is verified, and revert the affected module plus its matching documentation. Production hosts need only `dist` assets.
+
+
+## FPS estimates
+
+The optional Twitch getPlaybackStats().fps field feeds the existing two-second poll. Accept finite positive values in a visible, unpaused player. First valid reading is immediate; average up to five readings at least one second apart, expiring history at ten seconds. A conservative six-second cache guard refreshes on stats object replacement or FPS change; Twitch provides no public sample timestamp. Invalid/hidden/paused observations, lifecycle events, quality changes and status errors reset averaging. Manager gates numeric FPS on ONLINE + PLAYING and clears it on transitions. The header labels provider throughput as Twitch ~FPS, never presented smoothness. No persisted data or quality policy changes.

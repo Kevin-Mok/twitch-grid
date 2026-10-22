@@ -10,6 +10,7 @@ interface TwitchInstance {
   setQuality(quality: string): void; getQuality(): string;
   getQualities(): Array<string | { group: string; name?: string }>;
   isPaused(): boolean;
+  getPlaybackStats?(): unknown;
 }
 interface TwitchConstructor {
   new (elementId: string, options: { channel: string; width: string; height: string; parent: string[]; autoplay: boolean; muted: boolean }): TwitchInstance;
@@ -53,6 +54,11 @@ export const createTwitchPlayer: PlayerFactory = async (host, channel, emit) => 
   });
   let ready = false;
   let disposed = false;
+  let previousFps: unknown;
+  let previousFpsStats: unknown;
+  let fpsChangedAt = 0;
+  let fpsQuality = '';
+  const fpsSamples: Array<{ at: number; value: number }> = [];
   const listeners: Array<[string, () => void]> = [];
   const eventMap: Array<[string, PlayerEvent['type']]> = [
     [Player.READY, 'ready'], [Player.ONLINE, 'online'], [Player.OFFLINE, 'offline'],
@@ -61,13 +67,35 @@ export const createTwitchPlayer: PlayerFactory = async (host, channel, emit) => 
   const sample = () => {
     if (!ready || disposed) return;
     try {
+      let fps: number | null = null;
+      const quality = player.getQuality();
+      const paused = player.isPaused();
+      try {
+        const stats = player.getPlaybackStats?.();
+        const reportedFps = stats && typeof stats === 'object' && 'fps' in stats ? stats.fps : undefined;
+        const now = Date.now();
+        if (stats !== previousFpsStats || reportedFps !== previousFps) {
+          previousFpsStats = stats; previousFps = reportedFps; fpsChangedAt = now;
+        }
+        if (quality !== fpsQuality) { fpsSamples.length = 0; fpsQuality = quality; }
+        if (!paused && document.visibilityState === 'visible' && now - fpsChangedAt < 6000 && typeof reportedFps === 'number' && Number.isFinite(reportedFps) && reportedFps > 0) {
+          while (fpsSamples.length && now - fpsSamples[0].at >= 10000) fpsSamples.shift();
+          if (!fpsSamples.length || now - fpsSamples[fpsSamples.length - 1].at >= 1000) {
+            fpsSamples.push({ at: now, value: reportedFps });
+            if (fpsSamples.length > 5) fpsSamples.shift();
+          }
+          fps = fpsSamples.reduce((sum, sample) => sum + sample.value, 0) / fpsSamples.length;
+        }
+      } catch { /* Unsupported playback stats must not hide otherwise usable player status. */ }
+      if (fps === null) fpsSamples.length = 0;
       const qualities = player.getQualities().map(quality => typeof quality === 'string' ? quality : quality.group).filter(Boolean);
-      emit({ type: 'sample', quality: player.getQuality(), qualities, muted: player.getMuted(), volume: player.getVolume(), paused: player.isPaused() });
-    } catch { emit({ type: 'error', message: 'Player status is unavailable. Refresh status or reload this stream.' }); }
+      emit({ type: 'sample', quality, qualities, muted: player.getMuted(), volume: player.getVolume(), paused, fps });
+    } catch { fpsSamples.length = 0; emit({ type: 'error', message: 'Player status is unavailable. Refresh status or reload this stream.' }); }
   };
   for (const [name, type] of eventMap) {
     const listener = () => {
       if (disposed) return;
+      fpsSamples.length = 0;
       if (type === 'ready') { ready = true; window.clearTimeout(readyTimer); }
       emit({ type } as PlayerEvent);
       if (type === 'playing' || type === 'online') sample();

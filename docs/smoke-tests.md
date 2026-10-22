@@ -60,3 +60,11 @@ Use these checks against a static production build to verify actual viewing beha
 
 - Action: Open sidebar Settings at desktop and phone widths. Use Share and Backup & import, change Layout, toggle Chat, then close and reopen the sidebar with its menu button or Ctrl+B.
   Expected: Both transfer dialogs open and close normally, workspace controls remain reachable, and video/chat embeds stay mounted. Storage failures still show an actionable warning.
+
+
+## Twitch FPS estimate
+
+- Action: Add two live channels in a visible browser and start playback; inspect headers and hover the FPS readings.
+  Expected: Twitch ~… FPS appears within five seconds of valid provider stats becoming available, then refines over about ten seconds. The tooltip distinguishes provider playback from displayed smoothness. Unsupported stats show FPS —.
+- Action: Pause and resume a stream; change its quality; hide the tab for over ten seconds and return.
+  Expected: Unavailable observations clear the estimate. Valid playback starts a new averaging window, with no automatic quality changes, storage writes or player reload.

@@ -68,6 +68,8 @@ Use “Play all paused streams” to resume a saved/manual pause. Twitch’s eve
 
 “Hide offline streams” parks only players that have emitted OFFLINE. Their DOM hosts remain alive; return-to-live detection is best effort. Old offline observations are marked stale after two minutes. Use a sidebar channel’s reload button to recheck just that channel. Status requests or SDK errors are not treated as offline. There are no automatic reload loops or force-play timers.
 
+Each player header shows a labeled `Twitch ~30 FPS` estimate within two seconds of valid stats becoming available, then averages up to five readings over at most ten seconds. This is provider playback throughput, not measured visible smoothness. `FPS —` means unavailable. Pause, invalid/stale/hidden stats and quality changes reset the averaging window. Auto and manual quality preferences remain unchanged. See [FPS validation](docs/validation.md#fast-labeled-fps-estimate).
+
 ## Local data, backups and sharing
 
 Data is stored under `twitch-multiplayer:v2` on this browser and origin. It includes ordered channels, audio/quality preferences, playback intent, profiles, layout and chat settings. A paused preference is preserved; remembered playing intent does not bypass browser playback permissions.

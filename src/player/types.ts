@@ -11,11 +11,12 @@ export interface PlayerSnapshot {
   error: string | null;
   lastSignal: number;
   audioPending: boolean;
+  fps: number | null;
 }
 export type PlayerEvent =
   | { type: 'ready' | 'online' | 'offline' | 'play' | 'playing' | 'pause' | 'blocked' }
   | { type: 'error'; message: string }
-  | { type: 'sample'; quality: string; qualities: string[]; muted: boolean; volume: number; paused: boolean };
+  | { type: 'sample'; quality: string; qualities: string[]; muted: boolean; volume: number; paused: boolean; fps?: number | null };
 export interface PlayerHandle {
   play(): void;
   pause(): void;

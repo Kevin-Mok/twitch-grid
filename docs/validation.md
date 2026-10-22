@@ -57,3 +57,16 @@ All six task postmortems were reviewed and registered in the canonical `linux-co
 Fresh checks in the separate ordinary checkout passed: `npm ci` (94 packages, zero vulnerabilities), 128 unit/integration tests, TypeScript, production build, static artifact inspection and 18 browser tests. The public log appends the exact sanitized commands and exit statuses. Initial temp-directory writes were denied outside the original writable root; approved reruns passed without source changes, as recorded in the [permission report](postmortem/2026-10-22-publication-checkout-permissions.md). The user-reported [two-stream playback failure](postmortem/2026-10-22-simultaneous-playback.md) remains unresolved. No website deployment is part of repository publication.
 
 Publication privacy review: the shared staged gate passed after normalizing browser-version evidence, retaining the userinfo test through structured URL construction, and approving only the confirmed public GitHub noreply identity in an external mode-0600 policy. No scanner changes or broad content exceptions. The exact final index is checked again before commit. See the [privacy review](postmortem/2026-10-22-publication-privacy-review.md).
+
+
+## Fast labeled FPS estimate
+
+The user approved restoring an explicitly labeled provider estimate. `Twitch ~… FPS` uses the first finite positive `getPlaybackStats().fps` on the existing two-second poll, then averages up to five readings over roughly ten seconds. A five-second response is conditional on valid provider data; startup, blocked playback and unsupported browsers can remain unavailable. Invalid/stale/hidden/paused stats, lifecycle events and quality changes reset the window. Refresh calls less than one second apart cannot overweight the estimate. This does not calibrate the counter into presented frames or fix visible stuttering. No quality policy or persisted data changes.
+
+Adapter and manager defining RED tests confirmed missing FPS data before implementation. Current verification is recorded in [the atomic plan](../plans/fps-estimate.md). The desktop bridge returned BRIDGE_NOT_READY, so actual desktop startup timing and visible smoothness remain unverified.
+
+Fresh estimate verification: 148/148 unit tests across ten files, typecheck and production build passed. Full browser suite scheduled 33 cases; all listed passed and final `.last-run.json` status is passed with no failed tests (final count-summary line was not captured). The browser case covers `Twitch ~60 FPS` within five seconds, pause clearing and header containment at 390/768/1280/1440 widths. Adapter regression covers first reading, averaging, duplicate refresh, invalid/hidden/paused/stale/quality/lifecycle resets and old-history expiry after a 30-second gap. Actual desktop timing/smoothness remains unverified.
+
+Final browser count captured explicitly: `npx playwright test --reporter=dot` exited 0, **33 passed (24.4s)**. This resolves the earlier missing summary line.
+
+Commit-session isolated candidate verification on HEAD 9fe9e73: **142/142 unit tests**, typecheck/build exit 0 and **29/29 browser tests**. This candidate includes only FPS work and already committed prerequisites; earlier 148/33 results describe the shared dirty checkout.
