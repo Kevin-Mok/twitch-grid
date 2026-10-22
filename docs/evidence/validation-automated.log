@@ -1,0 +1,145 @@
+$ npm test
+
+> twitch-multiplayer@0.1.0 test
+> vitest run
+
+
+ RUN  v5.0.5 <source-workspace>
+
+
+ Test Files  8 passed (8)
+      Tests  128 passed (128)
+   Start at  13:55:25
+   Duration  2.58s (environment 80%, tests 14%, import 3%, transform 2%, worker 1%)
+
+EXIT_STATUS=0
+
+$ npm run typecheck
+
+> twitch-multiplayer@0.1.0 typecheck
+> tsc --noEmit
+
+EXIT_STATUS=0
+
+$ npm run build
+
+> twitch-multiplayer@0.1.0 build
+> tsc --noEmit && vite build
+
+vite v8.3.5 building client environment for production...
+transforming...
+✓ 29 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.61 kB │ gzip:  0.37 kB
+dist/assets/index-nm_TxdAz.css   15.56 kB │ gzip:  4.38 kB
+dist/assets/index-BmIytkOY.js   273.92 kB │ gzip: 85.32 kB
+
+✓ built in 208ms
+EXIT_STATUS=0
+
+$ npm run inspect
+
+> twitch-multiplayer@0.1.0 inspect
+> node scripts/inspect-build.mjs
+
+📦 Twitch Multiplayer — static build
+  assets/index-BmIytkOY.js                 267.5 KiB
+  assets/index-nm_TxdAz.css                 15.2 KiB
+  index.html                                 0.6 KiB
+✅ 2 entry assets resolve · 3 files · 283.3 KiB
+Serve dist with any static host; Twitch still requires internet.
+EXIT_STATUS=0
+
+$ npm run test:browser
+
+> twitch-multiplayer@0.1.0 test:browser
+> playwright test
+
+[WebServer] (node:724240) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 18 tests using 2 workers
+
+(node:724422) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:724421) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › tests/data-and-layout.spec.ts:11:1 › malformed storage is preserved while in-memory viewing continues (1.4s)
+  ✓   2 [chromium] › tests/watch.spec.ts:10:1 › five players retain iframe identity and navigation across all visual changes (1.7s)
+  ✓   3 [chromium] › tests/data-and-layout.spec.ts:21:1 › merging imported profiles never overwrites protected corrupt storage (602ms)
+  ✓   5 [chromium] › tests/data-and-layout.spec.ts:32:1 › blocked storage keeps the app usable and warns before the page closes (578ms)
+  ✓   4 [chromium] › tests/watch.spec.ts:30:1 › manual pause survives offline recovery; sound and quality stay independent (825ms)
+  ✓   7 [chromium] › tests/watch.spec.ts:44:1 › overlapping profiles preserve retained frames and restore ordered browser data (1.2s)
+  ✓   8 [chromium] › tests/watch.spec.ts:60:1 › validation, offline hiding, provider errors and malformed shared links are explicit (584ms)
+  ✓   6 [chromium] › tests/data-and-layout.spec.ts:41:1 › JSON backup download and explicit replacement restore the profile and channel order (2.4s)
+  ✓  10 [chromium] › tests/data-and-layout.spec.ts:65:1 › shared links apply only on request and never overwrite saved profiles (821ms)
+  ✓   9 [chromium] › tests/watch.spec.ts:75:1 › Ctrl+B ignores text fields and works outside them (1.4s)
+  ✓  11 [chromium] › tests/data-and-layout.spec.ts:80:1 › blocked SDK loading surfaces an actionable per-player error (543ms)
+  ✓  12 [chromium] › tests/data-and-layout.spec.ts:88:3 › layout with 1 players respects minimum embeds at practical desktop sizes (933ms)
+  ✓  13 [chromium] › tests/data-and-layout.spec.ts:88:3 › layout with 2 players respects minimum embeds at practical desktop sizes (737ms)
+  ✓  14 [chromium] › tests/data-and-layout.spec.ts:88:3 › layout with 3 players respects minimum embeds at practical desktop sizes (740ms)
+  ✓  15 [chromium] › tests/data-and-layout.spec.ts:88:3 › layout with 5 players respects minimum embeds at practical desktop sizes (550ms)
+  ✓  16 [chromium] › tests/data-and-layout.spec.ts:88:3 › layout with 8 players respects minimum embeds at practical desktop sizes (597ms)
+  ✓  17 [chromium] › tests/data-and-layout.spec.ts:104:3 › controls remain reachable at 390px (469ms)
+  ✓  18 [chromium] › tests/data-and-layout.spec.ts:104:3 › controls remain reachable at 768px (440ms)
+
+  18 passed (13.2s)
+EXIT_STATUS=0
+
+$ npm run inspect -- --plain
+
+> twitch-multiplayer@0.1.0 inspect
+> node scripts/inspect-build.mjs --plain
+
+Twitch Multiplayer - static build
+  assets/index-BmIytkOY.js                 267.5 KiB
+  assets/index-nm_TxdAz.css                 15.2 KiB
+  index.html                                 0.6 KiB
+2 entry assets resolve / 3 files / 283.3 KiB
+Serve dist with any static host; Twitch still requires internet.
+EXIT_STATUS=0
+
+## Publishing-check block — 2026-10-22 (new public checkout)
+
+Commands were run in the new ordinary Git checkout. Full raw output was retained privately under `/tmp/twitch-grid-*.log` and is not part of the public repository.
+
+$ npm ci
+Added 94 packages and audited 95 packages; 0 vulnerabilities.
+EXIT_STATUS=0
+
+$ npm test
+Test Files 8 passed (8)
+Tests 128 passed (128)
+EXIT_STATUS=0
+
+$ npm run typecheck
+TypeScript no-emit check passed.
+EXIT_STATUS=0
+
+$ npm run build
+Vite transformed 29 modules; production build completed. JavaScript 273.92 kB (85.32 kB gzip); CSS 15.56 kB (4.38 kB gzip).
+EXIT_STATUS=0
+
+$ npm run inspect
+2 entry assets resolve; 3 files; 283.3 KiB.
+EXIT_STATUS=0
+
+$ npm run test:browser
+18 Playwright tests passed (18 total; 2 workers), against the production static build.
+EXIT_STATUS=0
+
+The first non-escalated `npm test` and `npm run build` attempts could not create Vite's temporary config directory because this checkout is outside the default writable roots. Both checks passed on rerun with the authorized filesystem access. Playwright emitted only Node color-environment warnings. These mocked browser checks do not establish simultaneous real Twitch playback; the two-stream playback issue remains open.
+
+## Follow-up checks — 2026-10-22
+
+$ npm test
+Test Files 8 passed (8)
+Tests 128 passed (128)
+EXIT_STATUS=0
+
+$ npm run typecheck
+TypeScript no-emit check passed.
+EXIT_STATUS=0
+
+These checks ran after the Twitch URL privacy-gate test fixture was changed; production code and build configuration were unchanged.

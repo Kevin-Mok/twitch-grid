@@ -1,0 +1,170 @@
+{
+  "investigated_on": "2026-10-22",
+  "rea_version": "6.7.0",
+  "node_version": "24.22.1",
+  "browser": "Chrome/156.0.8078.47 Linux headless",
+  "cdp_binding": "127.0.0.1:9337",
+  "profile": "dedicated temporary, no existing user session",
+  "evidence": [
+    {
+      "capture": "targets",
+      "evidence_id": "ev_bcecccb4c77126386d11d8c4b9e76d5b82739762049e5f9a62ea1091856a4199",
+      "operation": "list_browser_targets",
+      "confidence": "observed",
+      "limitations": [
+        "Artifact identity is unavailable for this observation.",
+        "Only page targets whose current URL matches an explicitly requested exact origin are listed.",
+        "CDP discovery omitted attachment state for one or more targets; attached is reported as unknown.",
+        "Browser host platform and architecture were not observed."
+      ],
+      "full_capture_sha256": "9dd72d39c427a8879dd530e577f70d5bcd8934e932113eb21fae7bbd5eca6081",
+      "full_capture_retention": "temporary research files only; raw bundles and session metadata excluded from repository"
+    },
+    {
+      "capture": "initial-inspect",
+      "evidence_id": "ev_6ffad24574cae1c7d05cc9b486d79827320ab30b48593ebb39f6930a62e143ae",
+      "operation": "inspect_web_page",
+      "confidence": "observed",
+      "limitations": [
+        "Artifact identity is unavailable for this observation.",
+        "Observation starts when REA attaches; prior network and console activity is unavailable.",
+        "Raw network headers, bodies, cookies, storage values, console objects, and WebSocket payloads are never retained; explicitly requested primitive console text is retained verbatim, while payload captures retain value-free shapes.",
+        "Source maps are reported only as declarative URLs and are not fetched.",
+        "URL-less scripts and console events without an allowed source URL are excluded because their origin cannot be proven.",
+        "CDP discovery omitted the target attachment state; attached is reported as unknown.",
+        "Cookie fingerprints cover cookies applicable to the current main-frame URL, not every path on its origin.",
+        "Browser host platform and architecture were not observed."
+      ],
+      "full_capture_sha256": "80dd31d36f8866780db1c22754d5fd0d181c2e3dff13a16398112b168901b4f6",
+      "full_capture_retention": "temporary research files only; raw bundles and session metadata excluded from repository"
+    },
+    {
+      "capture": "initial-screenshot",
+      "evidence_id": "ev_a9de8eebce1b95088b5b2e729fcee180cdfecbb6d90cd2e41c7a29323e44c970",
+      "operation": "capture_web_screenshot",
+      "confidence": "observed",
+      "limitations": [
+        "Artifact identity is unavailable for this observation.",
+        "The screenshot contains the visible viewport, including on-screen content.",
+        "REA does not scroll, evaluate JavaScript, or capture beyond the current viewport.",
+        "Browser host platform and architecture were not observed."
+      ],
+      "full_capture_sha256": "d239fd2654d308d42c5a3669a33d5ea0a19f2698c0f19c528767a26dd636c983",
+      "full_capture_retention": "temporary research files only; raw bundles and session metadata excluded from repository"
+    },
+    {
+      "capture": "web-app-analysis",
+      "evidence_id": "ev_33c4bc7e96a4130e4f387a88061f3db5fccd98c9385acb4105a7986c0fdb987b",
+      "operation": "analyze_javascript_application",
+      "confidence": "derived",
+      "limitations": [
+        "Caller-selected source analysis leaves 12 inventoried files outside analysis scope. Inventory identity covers the complete artifact; relationships through unselected sources remain unknown.",
+        "CommonJS and ESM binding relationships were recovered from inert syntax and resolved only within the inventoried artifact container.",
+        "Graph coverage is incomplete; unavailable facts remain explicit and must not be read as absence.",
+        "JavaScript and HTML were parsed as inert text; bundle bootstrap code was never executed.",
+        "Static imports, entrypoints, workers, endpoints, and storage relationships do not prove runtime execution.",
+        "Static paths and relationships may remain unresolved when expressions are dynamic or obfuscated.",
+        "Webpack/Rspack factories were recovered from AST literals; REA did not invoke push handlers or bundle bootstrap code."
+      ],
+      "full_capture_sha256": "68332e1475a8ec1c1b2682aa9b9d48a1ddd4f7995a35b72215d5ed4c08c1ec7a",
+      "full_capture_retention": "temporary research files only; raw bundles and session metadata excluded from repository"
+    },
+    {
+      "capture": "interaction-observation",
+      "evidence_id": "ev_65f3fab903ef251ae7bae3c93225912d5d37b5ddafcd94712b99a731a1b662be",
+      "operation": "observe_web_session",
+      "confidence": "observed",
+      "limitations": [
+        "Artifact identity is unavailable for this observation.",
+        "The timeline begins after REA attaches; earlier navigation and network activity is unavailable.",
+        "Only navigation metadata is retained; headers, bodies, cookies, console values, and payloads are not captured by this tool.",
+        "An out-of-policy destination ends collection immediately and is recorded without its URL.",
+        "Browser host platform and architecture were not observed."
+      ],
+      "full_capture_sha256": "a19652a151bb500bbec8cadd6251e216b1b9ec46a6f38f0a0f6065afe273caad",
+      "full_capture_retention": "temporary research files only; raw bundles and session metadata excluded from repository"
+    },
+    {
+      "capture": "installer-inspect",
+      "evidence_id": "ev_b0193fc4a61c7e95fdbbad55163fd1537731f4f58b45126fa2d7898399f83701",
+      "operation": "inspect_artifact",
+      "confidence": "observed",
+      "limitations": [
+        "Artifact has no child container entries.",
+        "Inspection derives bounded static hypotheses and next probes; it does not execute the artifact or claim format-specific semantics."
+      ],
+      "full_capture_sha256": "080cbc762d03145886b743672ff74d93b0a02e0224b814bce5059268f9c50882",
+      "full_capture_retention": "temporary research files only; raw bundles and session metadata excluded from repository"
+    },
+    {
+      "capture": "asar-inspect",
+      "evidence_id": "ev_48c3a51514a557f0972be105f2fbecdde444727f71d93863203b6ca4e95cd541",
+      "operation": "inspect_artifact",
+      "confidence": "observed",
+      "limitations": [
+        "Inspection derives bounded static hypotheses and next probes; it does not execute the artifact or claim format-specific semantics."
+      ],
+      "full_capture_sha256": "0ebd34179f9e854632522533026c4ac2e6d7d8d9778ff68de17e4cf67276ee1d",
+      "full_capture_retention": "temporary research files only; raw bundles and session metadata excluded from repository"
+    },
+    {
+      "capture": "asar-extract-complete",
+      "evidence_id": "ev_69f3b92f417130614b65cad46812cd006eadc817ed0715b48719c8c65a04f54a",
+      "operation": "extract_artifact",
+      "confidence": "observed",
+      "limitations": [
+        "All regular files in the active artifact were materialized; nested archive contents remain represented by their containing file."
+      ],
+      "full_capture_sha256": "c7aa3357c9ac6f7bc2b18432e62e0f598b1c6dd23861075905ebe77ae1f16fe6",
+      "full_capture_retention": "temporary research files only; raw bundles and session metadata excluded from repository"
+    },
+    {
+      "capture": "desktop-analysis",
+      "evidence_id": "ev_f47f0e8e50130fc7fd9046c1561ce1211b8af7ab73c9cb783a0bf5149cee8b76",
+      "operation": "analyze_javascript_application",
+      "confidence": "derived",
+      "limitations": [
+        "Caller-selected source analysis leaves 14452 inventoried files outside analysis scope. Inventory identity covers the complete artifact; relationships through unselected sources remain unknown.",
+        "CommonJS and ESM binding relationships were recovered from inert syntax and resolved only within the inventoried artifact container.",
+        "Dynamic IPC channel expressions remain unresolved and are never paired by textual similarity.",
+        "Electron API identity follows proven lexical module aliases and structurally verified module-namespace interop. Other reassignments, dynamic selections, and visibly overwritten namespace members are unresolved; missing findings do not establish absence. Arbitrary call side effects and runtime registration are not evaluated.",
+        "Electron relationships are derived from inert syntax; runtime registration, reachability, defaults, and enforcement remain unproven.",
+        "Graph coverage is incomplete; unavailable facts remain explicit and must not be read as absence.",
+        "JavaScript and HTML were parsed as inert text; bundle bootstrap code was never executed.",
+        "Static imports, entrypoints, workers, endpoints, and storage relationships do not prove runtime execution.",
+        "Static paths and relationships may remain unresolved when expressions are dynamic or obfuscated.",
+        "Webpack/Rspack factories were recovered from AST literals; REA did not invoke push handlers or bundle bootstrap code."
+      ],
+      "full_capture_sha256": "ca04a7da88d7ce47acfc5da393c415b4e665166257d62971246bea8041f40764",
+      "full_capture_retention": "temporary research files only; raw bundles and session metadata excluded from repository"
+    },
+    {
+      "capture": "streams-screenshot",
+      "evidence_id": "ev_1ad7265eedb09c20bf080f3fba9e20a1f8dcb23b17cc15ac9baa32d4943cb2f4",
+      "operation": "capture_web_screenshot",
+      "confidence": "observed",
+      "limitations": [
+        "Artifact identity is unavailable for this observation.",
+        "The screenshot contains the visible viewport, including on-screen content.",
+        "REA does not scroll, evaluate JavaScript, or capture beyond the current viewport.",
+        "Browser host platform and architecture were not observed."
+      ],
+      "full_capture_sha256": "22c81c511f52d60df36be181cc67f148f060d16d3ef3a0c73082e034ab5b0b9d",
+      "full_capture_retention": "temporary research files only; raw bundles and session metadata excluded from repository"
+    },
+    {
+      "capture": "settings-screenshot",
+      "evidence_id": "ev_59f1e70ab1734c39ce0458fce4b6fe423eb2ac5ec2e21fc75662671fe381e2de",
+      "operation": "capture_web_screenshot",
+      "confidence": "observed",
+      "limitations": [
+        "Artifact identity is unavailable for this observation.",
+        "The screenshot contains the visible viewport, including on-screen content.",
+        "REA does not scroll, evaluate JavaScript, or capture beyond the current viewport.",
+        "Browser host platform and architecture were not observed."
+      ],
+      "full_capture_sha256": "a3286d6f20e6691892f3e605bfcc94af7c893d5cb71a2e6114a2914566a60506",
+      "full_capture_retention": "temporary research files only; raw bundles and session metadata excluded from repository"
+    }
+  ]
+}

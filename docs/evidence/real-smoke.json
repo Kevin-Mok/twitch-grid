@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-22",
+  "evidence_type": "Sanitized observations from isolated chrome-devtools-axi commands; no private account session",
+  "origin": "http://localhost:4174",
+  "browser": "HeadlessChrome/156 Linux x86_64 (major version)",
+  "viewport": {
+    "width": 1440,
+    "height": 913
+  },
+  "browser_reported_hardware": {
+    "logicalCores": 12,
+    "deviceMemoryGiB": 32,
+    "cpuModel": "unverified",
+    "gpuAcceleration": "unverified"
+  },
+  "app": {
+    "channel": "eslcs",
+    "videoFrame": {
+      "x": 268,
+      "y": 163.625,
+      "width": 1148,
+      "height": 645.75
+    },
+    "parent": "localhost",
+    "onlineEventObserved": true,
+    "availableQualities": [
+      "auto",
+      "chunked",
+      "720p60",
+      "480p30",
+      "360p30",
+      "160p30"
+    ],
+    "sampledQuality": "auto",
+    "intendedPlaybackAfterAppPlay": "playing",
+    "observedPlayback": "paused preview",
+    "messageEventsAfterAppPlayOver12Seconds": [
+      "UPDATE_STATE"
+    ],
+    "intersectionObserverV2": {
+      "intersectionRatio": 1,
+      "isVisible": true
+    },
+    "twitchWarning": "Autoplay disabled; style visibility requirement not met",
+    "chat": "Official public welcome and compose controls loaded; no login or message sent",
+    "automationTabSwitch": {
+      "sameVideoIframe": true,
+      "connected": true,
+      "visibilityEvents": [],
+      "visibilityState": "visible",
+      "provesBackgroundBehavior": false
+    }
+  },
+  "bareSdkControl": {
+    "channel": "eslcs",
+    "dimensions": {
+      "width": 1000,
+      "height": 600
+    },
+    "options": {
+      "autoplay": false,
+      "muted": true,
+      "parent": [
+        "localhost"
+      ]
+    },
+    "appLayoutOrInitializationSetters": false,
+    "events": [
+      "READY",
+      "ONLINE"
+    ],
+    "nativePlayAttempted": true,
+    "sampleOne": {
+      "currentTime": 1.512999,
+      "fps": 0,
+      "bufferSize": 0
+    },
+    "sampleTwoAfter5Seconds": {
+      "currentTime": 1.512999,
+      "fps": 0,
+      "bufferSize": 0
+    },
+    "pausedGetter": false,
+    "mutedGetter": true,
+    "movingVideoEstablished": false
+  },
+  "limits": [
+    "Underlying playback cause unresolved",
+    "Human audible output unverified",
+    "Signed-in chat unverified",
+    "No sustained or five-live-stream performance claim",
+    "No real offline-to-online transition observed",
+    "Windows runtime not executed"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "provenance": "Created from synthetic profiles in the isolated Viewington web UI on 2026-10-22. Generated copy codes were captured by replacing navigator.clipboard.writeText only on that page, preserving the user clipboard.",
+  "fixtures": [
+    {
+      "format": "utf8-base64",
+      "plain": "Test,twitch,monstercat",
+      "code": "VGVzdCx0d2l0Y2gsbW9uc3RlcmNhdA==",
+      "verification": "Reference Paste Profile created Test with two channels."
+    },
+    {
+      "format": "lz-string-base64",
+      "plain": "Compressed,twitch,monstercat",
+      "code": "MIewtgDgTgpgznGATANAFwO4Es0GMAWKYIAdnGjFLgIZpA==",
+      "verification": "Reference Paste Profile created Compressed with two channels."
+    },
+    {
+      "format": "utf8-base64",
+      "plain": "Shared,twitch,monstercat,eslcs,lck,theprimeagen",
+      "code": "U2hhcmVkLHR3aXRjaCxtb25zdGVyY2F0LGVzbGNzLGxjayx0aGVwcmltZWFnZW4=",
+      "verification": "Reference Share stream list generated this exact code."
+    },
+    {
+      "format": "lz-string-base64",
+      "plain": "Research research research,twitch,monstercat,eslcs,lck,theprimeagen",
+      "code": "EoUwziCGBODGAWACa4pySiMEBoAuA7gJZ64C2A9gHZh4hyR47gA2sYObA1vvCAA7QiZKAHMQVIA=",
+      "verification": "Reference Save Profile then profile Copy generated this exact code; independently decoded using lz-string1.5.0."
+    }
+  ]
+}
