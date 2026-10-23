@@ -23,3 +23,14 @@ This records the session-scoped logo delivery. The change updates the existing f
 - Next: privacy check, scoped commit, push main to origin/main, and verify the Vercel Git deployment. The resulting commit hash and deployment outcome will be reported in Codex output.
 - Rollback: revert this focused commit without rewriting history; no persisted-data schema changes.
 - Limits: no fresh live Twitch or screenshot check. External postmortem learning registration remains outstanding outside the writable workspace; see the verification incident. Vercel outcome is pending the push.
+
+## Milestone: fix: reclaim port 5173 before dev startup
+
+- Completed: npm predev force-stops TCP port 5173 with Linux fuser; Vite requires that port. README and smoke instructions describe replacement and permission failures.
+- Attribution: directly observed package.json edits, only port-related README/smoke hunks, the dev-port validation report and this appended status in session `01a16a5f-5ad8-7300-bdd4-b2bc5c8680db`. The scope helper did not detect wrapped writes; the captured initial dirty baseline and observed edits establish scope. All unrelated playback, UI, plans and documentation remain excluded.
+- Verified this turn: repeated actual npm startup replaced the first listener on 5173 and served HTTP 200; TypeScript passed. The dirty-workspace unit suite reports 150 passes and one startup-playback retry failure in manager.test.ts:43. Logs: `/tmp/twitch-port-commit-runtime.log`, `/tmp/twitch-port-commit-typecheck.log`, `/tmp/twitch-port-commit-tests.log`.
+- Exact staged candidate exported to `/tmp/twitch-grid-index-cCfpEB`: production build passed; unit suite has 150 passes and the same manager.test.ts:43 failure even with the unchanged staged player files. Logs: `/tmp/twitch-grid-index-tests.log`, `/tmp/twitch-grid-index-build.log`. No dependency installation or unrelated source edit was needed.
+- README gate: reviewed opening hook, stack rationale, bootstrap, usage and command options against the scoped package scripts. Updated the stale fallback claim; pre-existing unrelated README edits remain excluded.
+- Delivery: candidate review and README gate complete; run the privacy gate, commit this milestone and push origin/main, then verify the Vercel Git deployment. Commit and push outcomes will be reported in Codex output; the known unit failure is a validation warning.
+- Rollback: revert the focused commit; no application data or schema changes. Linux requires fuser from psmisc; it force-kills any process owning port 5173. Other ports are not targeted.
+- Limits: refresh-config is unavailable on PATH. Canonical postmortem-memory registration remains outstanding outside this workspace; no playback fix or real Twitch retest is included.

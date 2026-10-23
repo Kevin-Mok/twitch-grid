@@ -37,7 +37,7 @@ npm ci
 npm run dev
 ```
 
-The dev server binds to `127.0.0.1`, prefers port 5173, and tries another port if it is occupied. Read the printed URL. Preserve other listeners. `npm run dev -- --port 5200` chooses another preferred port; add `--strictPort` only when intentionally requiring one exact port. `--host` exposes the server beyond loopback and should be an explicit local choice.
+The dev server binds to `http://127.0.0.1:5173`. On Linux, `npm run dev` uses `fuser` (from `psmisc`) to force-stop any process using TCP port 5173 before starting Vite. Other ports are left alone. If the port cannot be freed, startup fails instead of selecting another port. The cleanup always targets 5173, even when passing Vite flags. `--host` exposes the server beyond loopback and should be an explicit local choice.
 
 Build and serve the actual static output:
 

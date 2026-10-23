@@ -67,7 +67,7 @@ Use these checks against a static production build to verify actual viewing beha
 ## Static hosting and development
 
 - Action: Keep port 5173 occupied with a server you own, then run `npm run dev`.
-  Expected: Vite preserves the first listener, selects another port and prints that URL.
+  Expected: The existing server is force-stopped and Vite prints `http://127.0.0.1:5173/`. Repeat `npm run dev` in another terminal: it replaces the first Vite server on 5173. Other ports are left alone. If cleanup lacks permission, startup fails instead of selecting another port. Linux requires `fuser` from `psmisc`.
 - Action: Serve only `dist` on a static host at a different hostname. Open a valid share fragment directly.
   Expected: App assets load without an app backend, secret or dev proxy. Each embed uses the current hostname; ancestor hosts require public `VITE_TWITCH_PARENTS` configuration. The new origin has separate local data.
 
