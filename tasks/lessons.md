@@ -16,3 +16,5 @@ Use these local lessons when changing this app. Reproduce a boundary failure fir
 - Removing a visible status label can break readiness checks in unrelated browser scenarios. Search all tests for the old text and use the retained accessible status indicator without weakening playback/quality assertions.
 
 - Twitch playback stats are cached and start at zero. Label the provider explicitly: an averaged decoded/total-frame rate can conceal uneven frame delivery. Treat reported FPS as a diagnostic with unsupported/stale states; do not infer displayed smoothness, source FPS or a GPU/network bottleneck. Public freshness/ad-state gaps must be resolved before an app quality policy uses the metric.
+
+- Focus/fullscreen quality priority must be transient and receive explicit selection state; CSS enlargement alone cannot reserve quality. Restrict priority fallback to available video/Source/Auto so SDK ordering cannot accidentally select Audio only. Exit restores saved preferences without changing sound or player identity.

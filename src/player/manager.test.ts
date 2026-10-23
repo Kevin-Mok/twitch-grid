@@ -31,6 +31,37 @@ function fixture() {
 }
 
 describe('persistent player manager', () => {
+  it('temporarily prioritizes the selected stream and restores saved quality without touching playback or audio', async () => {
+    const f = fixture();
+    const channels = [channel('alpha'), { ...channel('bravo'), quality: '720p60' }];
+    f.manager.sync(channels, '480p'); await tick();
+    const sample = (login: string, qualities = ['auto', 'chunked', '720p60', '160p30', '480p30', 'audio_only']) => {
+      f.emitters.get(login)!({ type: 'sample', muted: true, volume: 0.5, paused: false, quality: 'auto', qualities });
+    };
+    for (const login of ['alpha', 'bravo']) { f.emitters.get(login)!({ type: 'ready' }); sample(login); }
+    const before = f.calls.length;
+    f.manager.sync(channels, '480p', 'alpha');
+    expect(f.calls.slice(before)).toEqual(['quality:alpha:chunked', 'quality:bravo:160p30']);
+    f.manager.sync(channels, '480p', 'bravo');
+    expect(f.calls.slice(-2)).toEqual(['quality:alpha:160p30', 'quality:bravo:chunked']);
+    // Source missing: use the highest numeric video, independent of SDK ordering.
+    sample('bravo', ['auto', 'audio_only', '480p30', '1080p60', '720p60']);
+    expect(f.calls.at(-1)).toBe('quality:bravo:1080p60');
+    sample('alpha', ['audio_only', 'auto']);
+    expect(f.calls.at(-1)).toBe('quality:alpha:auto');
+    sample('alpha', ['audio_only', 'chunked']);
+    expect(f.calls.at(-1)).toBe('quality:alpha:chunked');
+    const withoutVideo = f.calls.length;
+    sample('alpha', ['audio_only']);
+    expect(f.calls).toHaveLength(withoutVideo);
+    sample('alpha'); sample('bravo');
+    f.manager.sync(channels, '480p');
+    expect(f.calls.slice(-2)).toEqual(['quality:alpha:480p30', 'quality:bravo:720p60']);
+    expect(f.manager.slots().map(slot => slot.channel)).toEqual(channels);
+    expect(f.observed).toEqual([]);
+    expect(f.calls.slice(before).every(call => call.startsWith('quality:'))).toBe(true);
+    f.manager.destroy();
+  });
   it('shows reported bitrate only during active playback and never changes Auto or manual quality for low bitrate', async () => {
     const f = fixture(); f.manager.sync([channel('alpha')], 'auto'); await tick();
     const emit = f.emitters.get('alpha')!;

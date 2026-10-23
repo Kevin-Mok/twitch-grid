@@ -20,7 +20,16 @@ export function PlayerSurface({ session, managerRef, patchChannel, openChat, rem
   const [slots, setSlots] = useState<PlayerSlot[]>([]);
   const [size, setSize] = useState({ width: 900, height: 700 });
   const [revision, setRevision] = useState(0);
+  const [fullscreen, setFullscreen] = useState<string | null>(null);
+  const selected = fullscreen ?? focus;
+  const priority = session.channels.some(channel => channel.login === selected) ? selected : null;
   const observed = useRef(patchChannel); observed.current = patchChannel;
+
+  useEffect(() => {
+    const onFullscreen = () => setFullscreen(document.fullscreenElement?.closest<HTMLElement>('[data-channel]')?.dataset.channel ?? null);
+    document.addEventListener('fullscreenchange', onFullscreen);
+    return () => document.removeEventListener('fullscreenchange', onFullscreen);
+  }, []);
 
   useLayoutEffect(() => {
     const manager = new PlayerManager(surface.current!, createTwitchPlayer, () => setRevision(x => x + 1), (login, patch) => observed.current(login, patch));
@@ -29,9 +38,9 @@ export function PlayerSurface({ session, managerRef, patchChannel, openChat, rem
   }, [managerRef]);
   useLayoutEffect(() => {
     const manager = managerRef.current!;
-    manager.sync(session.channels, session.globalQuality);
+    manager.sync(session.channels, session.globalQuality, priority);
     setSlots(manager.slots());
-  }, [session.channels, session.globalQuality, managerRef, revision]);
+  }, [session.channels, session.globalQuality, managerRef, revision, priority]);
   useEffect(() => {
     onBitrates(Object.fromEntries(slots.map(slot => [slot.channel.login, slot.snapshot.bitrateKbps])));
   }, [slots, revision, onBitrates]);
@@ -44,9 +53,8 @@ export function PlayerSurface({ session, managerRef, patchChannel, openChat, rem
     observer.observe(element); return () => observer.disconnect();
   }, []);
 
-  const visible = session.channels.filter(channel => !session.hideOffline || slots.find(slot => slot.channel.login === channel.login)?.snapshot.live !== 'offline');
-  const focusIndex = focus ? visible.findIndex(c => c.login === focus) : -1;
-  const layout = calculateLayout(visible.length, size.width, size.height, session.layout, focusIndex >= 0 ? focusIndex : null);
+  const visible = session.channels.filter(channel => priority ? channel.login === priority : !session.hideOffline || slots.find(slot => slot.channel.login === channel.login)?.snapshot.live !== 'offline');
+  const layout = calculateLayout(visible.length, size.width, size.height, session.layout);
   const scale = Math.min(1, size.width / layout.width, size.height / layout.height);
   useLayoutEffect(() => {
     for (const slot of slots) {

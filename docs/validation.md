@@ -141,3 +141,11 @@ Online headers retain the accessible green status dot and omit the visible Live 
 
 
 Commit-session standalone candidate on HEAD c7e00dc: npm test **143/143** across ten files; npm run build (including typecheck) exit 0; full npx playwright test **30/30** exit 0. Candidate excludes uncommitted bitrate/chat-crop/playback work. Its standalone channel-status scenario verifies casing re-entry, no duplicated/replaced iframe, sidebar/chat labels, accessible online status without visible Live and reload persistence. No real Twitch or screenshot check was performed.
+
+## Single-stream focus and fullscreen (2026-10-23)
+
+Final working-tree verification after the safe no-Auto fallback: 152/152 unit tests (`npm test`), TypeScript/Vite build (`npm run build`), and 40/40 Playwright cases. The browser suite used an isolated temporary config on 4174 because 4173 was already occupied; that listener was preserved. See [plan and exact evidence](../plans/fullscreen-priority.md).
+
+Defining regressions failed before correction: focus left three visible tiles, priority issued no quality requests, and a missing-Auto fallback selected Audio only. Tests now exercise selected-only focus and native tile/iframe fullscreen, temporary Source/background-lowest requests, restoration, absent renditions, offline/reload/removal, unchanged sound/settings and retained frame identity. Desktop/mobile fixture screenshots showed one Source tile. These are application/controlled-SDK checks, not measurements of sustained Twitch motion, physical sound or bandwidth savings; follow the shared smoke checklist for those observations.
+
+Commit-session isolation: HEAD plus only the fullscreen session changes independently passed 146/146 unit tests, TypeScript/Vite build and 34/34 browser tests (temporary preview port 4175). The earlier 152/40 results include unrelated dirty work and are not claimed for this commit.

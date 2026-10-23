@@ -15,6 +15,7 @@ const initialSnapshot = (): PlayerSnapshot => ({ live: 'unknown', playback: 'loa
 export class PlayerManager {
   private entries = new Map<string, Entry>();
   private globalQuality = 'auto';
+  private priority: string | null = null;
   private closed = false;
 
   constructor(
@@ -24,9 +25,12 @@ export class PlayerManager {
     private observed: (login: string, patch: Partial<Channel>) => void,
   ) {}
 
-  sync(channels: Channel[], globalQuality: string): void {
+  sync(channels: Channel[], globalQuality: string, priority: string | null = null): void {
     if (this.closed) return;
     const qualityChanged = this.globalQuality !== globalQuality;
+    const nextPriority = channels.some(channel => channel.login === priority) ? priority : null;
+    const priorityChanged = this.priority !== nextPriority;
+    this.priority = nextPriority;
     this.globalQuality = globalQuality;
     const keep = new Set(channels.map(channel => channel.login));
     for (const [login, entry] of this.entries) {
@@ -37,7 +41,7 @@ export class PlayerManager {
       if (!entry) { this.create(channel); continue; }
       const previous = entry.channel;
       entry.channel = { ...channel };
-      if ((qualityChanged && channel.quality === null) || previous.quality !== channel.quality) entry.requestedQuality = null;
+      if (priorityChanged || (qualityChanged && channel.quality === null) || previous.quality !== channel.quality) entry.requestedQuality = null;
       if (entry.ready && entry.handle) {
         if (previous.muted !== channel.muted) { entry.pendingMuted = channel.muted; entry.handle.setMuted(channel.muted); }
         if (previous.volume !== channel.volume) { entry.pendingVolume = channel.volume; entry.handle.setVolume(channel.volume); }
@@ -89,7 +93,16 @@ export class PlayerManager {
   }
 
   private applyQuality(entry: Entry, retry = false): void {
-    const preference = entry.channel.quality ?? this.globalQuality;
+    let preference: string | null = entry.channel.quality ?? this.globalQuality;
+    if (this.priority) {
+      const videoQualities = entry.snapshot.qualities.filter(quality => /^\d+p\d*(?:\.\d+)?$/.test(quality))
+        .sort((a, b) => parseInt(a) - parseInt(b) || Number(a.split('p')[1] || 0) - Number(b.split('p')[1] || 0));
+      const fallback = entry.snapshot.qualities.includes('auto') ? 'auto' : entry.snapshot.qualities.includes('chunked') ? 'chunked' : null;
+      preference = entry.channel.login === this.priority
+        ? entry.snapshot.qualities.includes('chunked') ? 'chunked' : videoQualities.at(-1) ?? fallback
+        : videoQualities[0] ?? fallback;
+    }
+    if (!preference) return;
     const selected = chooseQuality(preference, entry.snapshot.qualities);
     entry.snapshot.fallback = selected && selected !== preference && selected !== `${preference}30` ? `${preference} unavailable; using ${selected}` : null;
     if (!selected || !entry.ready || !entry.handle) return;
