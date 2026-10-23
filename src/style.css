@@ -117,7 +117,7 @@ small { display: block; font-size: 10px; line-height: 1.5; color: var(--muted); 
 .video-host { min-width: 400px; min-height: 300px; flex: 1; background: #0b0e0c; }
 .video-host > iframe { width: 100%; height: 100%; display: block; border: 0; }
 .tile-message { position: absolute; top: 40px; right: 8px; left: 8px; z-index: 1; font-size: 11px; line-height: 1.5; color: #efcf99; background: #25271df2; border: 1px solid #4a4931; border-radius: 4px; padding: 8px 10px; pointer-events: none; }
-.player-tile:fullscreen { width: 100vw !important; height: 100dvh !important; transform: none !important; border-radius: 0; }
+.player-tile:fullscreen { width: 100vw !important; height: 100dvh !important; zoom: 1 !important; transform: none !important; border-radius: 0; }
 .focus-exit { position: absolute; top: 8px; left: 8px; z-index: 3; background: #284330; border-color: #48674d; color: #cee9d0; }
 .empty-workspace { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px; text-align: center; pointer-events: none; }
 .empty-grid { width: 124px; height: 78px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 28px; transform: rotate(-5deg); }

@@ -60,7 +60,7 @@ Preview prefers `http://127.0.0.1:4173` and also prints its selected port. `npm 
 6. Use **Maximize video** in sidebar **Settings** to hide the sidebar. **Restore workspace** or Escape brings it back without reloading embeds or changing saved sidebar preferences. Video keeps its proportions and all rows fit the available height.
 7. Save named profiles. Load preserves overlapping player instances. “Update selected profile” explicitly saves edits to its lineup/settings; rename and delete are separate controls.
 
-The sidebar uses compact text and spacing, with channel actions beside names so more streams fit vertically.
+The sidebar uses compact text and spacing, with channel actions beside names so more streams fit vertically. The fitted player grid uses CSS zoom rather than transform downscaling so Chrome continues to recognize on-screen Twitch players as visible for autoplay and API Play.
 
 Default resolution labels such as 360p and 480p match Twitch's corresponding `360p30` and `480p30` rendition IDs. Changing Default quality applies it to every current stream and clears older per-stream overrides; the updated lineup persists locally. Saved profiles keep their settings until explicitly updated. The manager makes up to three attempts to apply a quality request and reapplies after an offline/online recovery. Once acknowledged, native Twitch quality changes remain usable. Unavailable preferences fall back silently; player errors remain visible.
 
@@ -80,7 +80,7 @@ Each player header shows a `30 FPS` estimate (identified as Twitch-reported in i
 
 ## Local data, backups and sharing
 
-Data is stored under `twitch-multiplayer:v2` on this browser and origin. It includes ordered channels, audio/quality preferences, playback intent, profiles, layout and chat settings. A paused preference is preserved; remembered playing intent does not bypass browser playback permissions.
+Data is stored under `twitch-multiplayer:v2` on this browser and origin. It includes ordered channels, audio/quality preferences, playback intent, profiles, layout and chat settings. A paused preference is preserved; remembered playing intent does not bypass browser playback permissions. Play all paused streams sends Play to every current player without filtering on cached SDK state, preserving existing iframes and audio/quality preferences. On ONLINE, unconfirmed playing intent receives another Play request; confirmed playing and explicit pause are preserved.
 
 Private browsing, site-data deletion, another device, another Vercel preview address or a custom domain can mean different or absent storage. Export a JSON backup to transfer it. No profile data is uploaded by this app and it adds no telemetry. Twitch embeds make their own network requests.
 

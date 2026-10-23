@@ -54,7 +54,7 @@ test('sidebar stream controls apply to the lineup and preserve player preference
   await page.keyboard.press('Enter');
   await expect(page.locator('.channel-name').filter({ hasText: /^alpha/ })).toContainText('Sound on');
   const playCalls = await page.evaluate(() => (window as unknown as { __calls: unknown[][] }).__calls.filter(call => call[0] === 'play'));
-  expect(playCalls).toEqual([['play', 'alpha']]);
+  expect(playCalls).toEqual([['play', 'alpha'], ['play', 'bravo']]);
 
   await pause.click();
   await expect.poll(() => page.evaluate(() => Object.values((window as unknown as { __players: Record<string, { paused: boolean }> }).__players).map(player => player.paused))).toEqual([true, true]);

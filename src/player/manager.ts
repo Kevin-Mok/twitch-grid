@@ -134,6 +134,7 @@ export class PlayerManager {
         state.error = null;
         if (reconnecting) entry.requestedQuality = null;
         if (entry.channel.intent === 'paused') entry.handle?.pause();
+        else if (state.playback !== 'playing') entry.handle?.play();
         break;
       case 'offline': state.error = null; break;
       case 'play':

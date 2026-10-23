@@ -62,7 +62,8 @@ export function PlayerSurface({ session, managerRef, patchChannel, openChat, rem
       const tile = index >= 0 ? layout.tiles[index] : { x: 0, y: -10000, width: 400, height: 336 };
       const x = (size.width - layout.width * scale) / 2 + tile.x * scale;
       const y = (size.height - layout.height * scale) / 2 + tile.y * scale;
-      Object.assign(slot.element.style, { width: `${tile.width}px`, height: `${tile.height}px`, transform: `translate(${x}px, ${y}px) scale(${scale})` });
+      // Transform downscaling makes Chromium report visible embeds as invisible to Twitch.
+      Object.assign(slot.element.style, { width: `${tile.width}px`, height: `${tile.height}px`, zoom: String(scale), transform: `translate(${x / scale}px, ${y / scale}px)` });
       slot.element.classList.toggle('parked', index < 0);
       slot.element.classList.toggle('focused', slot.channel.login === focus);
       slot.element.inert = index < 0;

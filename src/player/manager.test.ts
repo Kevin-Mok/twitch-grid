@@ -31,6 +31,17 @@ function fixture() {
 }
 
 describe('persistent player manager', () => {
+  it('retries ONLINE only for unconfirmed playing intent', async () => {
+    const f = fixture();
+    f.manager.sync([channel('waiting'), channel('running'), { ...channel('paused'), intent: 'paused' }], 'auto'); await tick();
+    for (const login of ['waiting', 'running', 'paused']) f.emitters.get(login)!({ type: 'ready' });
+    f.emitters.get('running')!({ type: 'playing' });
+    f.calls.length = 0;
+    for (const login of ['waiting', 'running', 'paused']) f.emitters.get(login)!({ type: 'online' });
+    expect(f.calls).toEqual(['play:waiting', 'pause:paused']);
+    expect(f.manager.slots().map(slot => slot.channel.intent)).toEqual(['playing', 'playing', 'paused']);
+    f.manager.destroy();
+  });
   it('temporarily prioritizes the selected stream and restores saved quality without touching playback or audio', async () => {
     const f = fixture();
     const channels = [channel('alpha'), { ...channel('bravo'), quality: '720p60' }];

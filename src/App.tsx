@@ -50,9 +50,7 @@ export function App() {
     if (command === 'toggle-chat') updateSession(s => ({ ...s, chat: { ...s.chat, open: !s.chat.open, channel: s.chat.channel ?? s.channels[0]?.login ?? null } }));
     if (command === 'pause-all') updateSession(s => ({ ...s, channels: s.channels.map(c => ({ ...c, intent: 'paused' })) }));
     if (command === 'mute-all') updateSession(s => ({ ...s, channels: s.channels.map(c => ({ ...c, muted: true })) }));
-    if (command === 'play-paused') for (const slot of manager.current?.slots() ?? []) {
-      if (slot.channel.intent === 'paused' || ['paused', 'blocked', 'loading'].includes(slot.snapshot.playback)) manager.current?.start(slot.channel.login);
-    }
+    if (command === 'play-paused') for (const channel of current.current.session.channels) manager.current?.start(channel.login);
     if (command === 'reload-all') for (const c of current.current.session.channels) manager.current?.reload(c.login);
     if (command === 'fullscreen') {
       const action = document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
